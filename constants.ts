@@ -21,12 +21,19 @@ const FASHION_IMAGES = [
 
 const getImage = (index: number) => FASHION_IMAGES[index % FASHION_IMAGES.length];
 
-const PLANNING_DEVELOPERS = [
+export const PLANNING_DEVELOPERS = [
   '沈可忻',
   'Lindsay Fiegleman',
   'Eva 卜依文',
   '谈嘉轩momo',
   'Esther Blum'
+];
+
+export const PRODUCT_LINES = [
+  '常规码',
+  '大码',
+  '男装',
+  '童装'
 ];
 
 const DEV_STATUSES = [
@@ -63,7 +70,9 @@ export const MOCK_PRODUCTS: Product[] = [
     selectionStatus: 'Selected',
     operator: '系统 (测试)',
     createdTime: '2026-01-29 15:38',
-    selectionTime: '2026-01-29 15:38'
+    selectionTime: '2026-01-29 15:38',
+    dropGoal: '120',
+    developedCount: 45
   },
   {
     id: '52',
@@ -87,7 +96,9 @@ export const MOCK_PRODUCTS: Product[] = [
     selectionStatus: 'Selected',
     operator: '系统 (测试)',
     createdTime: '2026-01-29 15:38',
-    selectionTime: '2026-01-29 15:38'
+    selectionTime: '2026-01-29 15:38',
+    dropGoal: '100',
+    developedCount: 32
   },
   {
     id: '51',
@@ -111,7 +122,9 @@ export const MOCK_PRODUCTS: Product[] = [
     selectionStatus: 'Selected',
     operator: '系统 (测试)',
     createdTime: '2026-01-29 15:38',
-    selectionTime: '2026-01-29 15:38'
+    selectionTime: '2026-01-29 15:38',
+    dropGoal: '150',
+    developedCount: 88
   },
   {
     id: '50',
@@ -136,7 +149,9 @@ export const MOCK_PRODUCTS: Product[] = [
     selectionStatus: 'Selected',
     operator: '系统 (测试)',
     createdTime: '2026-01-29 15:38',
-    selectionTime: '2026-01-29 15:38'
+    selectionTime: '2026-01-29 15:38',
+    dropGoal: '200',
+    developedCount: 156
   },
   {
     id: '49',
@@ -158,7 +173,9 @@ export const MOCK_PRODUCTS: Product[] = [
     selectionStatus: 'Pending',
     operator: '系统',
     createdTime: '2026-01-30 10:00',
-    selectionTime: '-'
+    selectionTime: '-',
+    dropGoal: '80',
+    developedCount: 20
   },
   {
     id: '48',
@@ -180,7 +197,9 @@ export const MOCK_PRODUCTS: Product[] = [
     selectionStatus: 'Pending',
     operator: '系统',
     createdTime: '2026-01-30 10:15',
-    selectionTime: '-'
+    selectionTime: '-',
+    dropGoal: '110',
+    developedCount: 40
   },
   {
     id: '47',
@@ -202,7 +221,9 @@ export const MOCK_PRODUCTS: Product[] = [
     selectionStatus: 'Pending',
     operator: '系统',
     createdTime: '2026-01-30 11:00',
-    selectionTime: '-'
+    selectionTime: '-',
+    dropGoal: '130',
+    developedCount: 65
   },
   {
     id: '46',
@@ -224,6 +245,8 @@ export const MOCK_PRODUCTS: Product[] = [
     selectionStatus: 'Selected',
     operator: '系统',
     createdTime: '2026-01-30 11:30',
-    selectionTime: '2026-01-30 12:00'
+    selectionTime: '2026-01-30 12:00',
+    dropGoal: '100',
+    developedCount: 90
   }
 ];

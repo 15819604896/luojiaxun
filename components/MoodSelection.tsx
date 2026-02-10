@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Plus, Copy, Check, X, Edit, Search, Tag, ChevronLeft, ChevronRight, Inbox, Download, Shirt, GripVertical, PanelRightClose, PanelRightOpen, GripHorizontal, Maximize2, Minimize2, Trash2, Settings, Zap, CheckSquare, Square, BarChart3, ChevronDown, ChevronUp, Folder } from 'lucide-react';
+import { Plus, Copy, Check, X, Edit, Search, Tag, ChevronLeft, ChevronRight, Inbox, Download, Shirt, PanelRightClose, PanelRightOpen, GripHorizontal, Maximize2, Minimize2, Trash2, Zap, CheckSquare, Square, BarChart3, Filter, User, Layers, Save, Send, PieChart } from 'lucide-react';
 import { Product } from '../types';
 import SelectionDecisionModal from './SelectionDecisionModal';
 
@@ -8,7 +8,22 @@ interface MoodSelectionProps {
   products: Product[];
 }
 
-const STORES = ['Valley Fair-VF', 'Farmer Market-FM'];
+const STORES = [
+  'Valley Fair-VF', 'Farmer Market-FM', 'Stanford-SF', 'Century City-CC',
+  'Soho-NYC', 'Fifth Ave-NYC', 'Newbury-BOS', 'Prudential-BOS',
+  'NorthPark-DAL', 'Galleria-HOU', 'Domain-AUS', 'Highland-AUS',
+  'Lenox-ATL', 'Phipps-ATL', 'Aventura-MIA', 'Design Dist-MIA',
+  'Mag Mile-CHI', 'Rush St-CHI', 'Forum-LV', 'Crystals-LV',
+  'South Coast-LA', 'Beverly Center-LA', 'Americana-LA', 'Grove-LA',
+  'Union Sq-SF', 'Fillmore-SF', 'Santana Row-SJ', 'University-SEA',
+  'Bellevue-WA', 'Pioneer-POR', 'Cherry Creek-DEN', 'Scottsdale-AZ',
+  'Tysons-DC', 'Georgetown-DC', 'King of Prussia-PA', 'Rittenhouse-PA',
+  'Somerset-MI', 'Easton-OH', 'Green Hills-TN', 'SouthPark-NC',
+  'International-FL', 'Millenia-FL', 'Short Hills-NJ', 'Garden State-NJ',
+  'Roosevelt-NY', 'Manhasset-NY', 'Westfield-UK', 'Covent Garden-UK',
+  'Oxford St-UK', 'Regent St-UK'
+];
+
 const GRADES = ['S', 'A', 'B', 'C', 'D'];
 const CATEGORIES = ['毛织', '牛仔', '半裙', 'T恤', '衬衫', '连衣裙', '外套', '卫衣', '裤装', '配饰', '套装'];
 
@@ -177,8 +192,20 @@ const ProductHoverPreview: React.FC<{ product: Product; children: React.ReactNod
                         <span className="text-slate-800 font-medium">{product.drop}</span>
                     </div>
                  </div>
+
+                 {/* New Row: Drop Goal & Passed Count */}
+                 <div className="grid grid-cols-2 gap-x-4 gap-y-3 pt-1">
+                    <div className="flex flex-col gap-0.5">
+                        <span className="text-slate-400 uppercase text-[10px] font-bold tracking-wider">Drop Goal</span>
+                        <span className="text-slate-800 font-medium">{product.dropGoal || '-'}</span>
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                        <span className="text-slate-400 uppercase text-[10px] font-bold tracking-wider">Passed Count</span>
+                        <span className="text-slate-800 font-medium">{product.developedCount || '-'}</span>
+                    </div>
+                 </div>
                  
-                 {/* New Fields in Hover */}
+                 {/* Line & Planner */}
                  <div className="grid grid-cols-2 gap-x-4 gap-y-3 pt-1">
                     <div className="flex flex-col gap-0.5">
                         <span className="text-slate-400 uppercase text-[10px] font-bold tracking-wider">Line</span>
@@ -275,7 +302,8 @@ const ProductCard: React.FC<{
   actionIcon?: React.ReactNode;
   actionClass?: string;
   variant?: 'grid' | 'list';
-}> = ({ product, onAction, actionIcon, actionClass, variant = 'grid' }) => {
+  showDetails?: boolean;
+}> = ({ product, onAction, actionIcon, actionClass, variant = 'grid', showDetails = true }) => {
   
   if (variant === 'list') {
       return (
@@ -301,15 +329,17 @@ const ProductCard: React.FC<{
                         {product.categoryPath}
                     </div>
                     
-                    {/* Show Tags instead of Line & Developer */}
-                    {product.tags && product.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mt-1 mb-2">
-                             {product.tags.map((tag, i) => (
-                                 <span key={i} className="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-50 text-slate-500 border border-slate-100 text-[9px]">
-                                     <Tag size={8} className="mr-1 text-slate-400" />
-                                     {tag}
-                                 </span>
-                             ))}
+                    {/* Added: Product Line & Planner */}
+                    {showDetails && (
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 mb-2">
+                            <div className="flex items-center gap-1 text-[10px] text-slate-600">
+                                <Layers size={10} className="text-slate-400" />
+                                {product.productLine}
+                            </div>
+                            <div className="flex items-center gap-1 text-[10px] text-slate-600">
+                                <User size={10} className="text-slate-400" />
+                                {product.planningDeveloper}
+                            </div>
                         </div>
                     )}
                 </div>
@@ -382,8 +412,20 @@ const ProductCard: React.FC<{
             <div className="text-[10px] text-slate-500 mb-2 leading-tight h-8 overflow-hidden text-ellipsis line-clamp-2" title={product.categoryPath}>
                 {product.categoryPath}
             </div>
+
+            {/* Added: Product Line & Planner */}
+            {showDetails && (
+                <div className="flex flex-wrap gap-y-1 gap-x-2 mb-2">
+                     <div className="flex items-center gap-1 text-[9px] text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
+                        <Layers size={8} /> {product.productLine}
+                     </div>
+                     <div className="flex items-center gap-1 text-[9px] text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
+                        <User size={8} /> {product.planningDeveloper}
+                     </div>
+                </div>
+            )}
             
-            <div className="mt-auto pt-2 flex items-center justify-between border-t border-slate-50">
+            <div className={`mt-auto pt-2 flex items-center justify-between border-t border-slate-50`}>
                 <div className="flex gap-1 flex-wrap h-5 overflow-hidden">
                     {/* Updated to show up to 2 tags */}
                     {product.tags.slice(0, 2).map((t, i) => (
@@ -419,22 +461,27 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
   // Selection for Batch Actions
   const [selectedProductIds, setSelectedProductIds] = useState<Set<string>>(new Set());
   
-  // Batch Grade State
-  const [batchTargetStores, setBatchTargetStores] = useState<string[]>([]);
-  const [batchGrade, setBatchGrade] = useState(GRADES[0]);
+  // Batch Grading State (Changed from Batch Category)
+  const [batchTargetStore, setBatchTargetStore] = useState(STORES[0]);
+  const [batchTargetGrade, setBatchTargetGrade] = useState(GRADES[0]);
+
   const [showStats, setShowStats] = useState(true);
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
 
-  // Filter State (Internal logic kept, UI triggers removed)
+  // Filter State
   const [activeFilters, setActiveFilters] = useState({
       search: '',
       productLine: '',
       planningDeveloper: '',
       store: [] as string[]
   });
+
+  // Derived filter options
+  const productLines = useMemo(() => Array.from(new Set(products.map(p => p.productLine).filter(Boolean))), [products]);
+  const planners = useMemo(() => Array.from(new Set(products.map(p => p.planningDeveloper).filter(Boolean))), [products]);
 
   // Helper to apply filters
   const applyFilters = (list: Product[]) => {
@@ -476,7 +523,14 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
           });
       });
 
-      selectedList.forEach(p => {
+      // DETERMINE SOURCE LIST FOR STATS
+      // If any items are selected, show stats for ONLY selected items (Single or Multi)
+      // If no items are selected, show stats for ALL items in selectedList
+      const targetList = selectedProductIds.size > 0 
+          ? selectedList.filter(p => selectedProductIds.has(p.id))
+          : selectedList;
+
+      targetList.forEach(p => {
           p.stores.forEach(s => {
               if (stats[s.storeName]) {
                   if (stats[s.storeName][s.grade] !== undefined) {
@@ -486,7 +540,7 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
           });
       });
       return stats;
-  }, [selectedList]);
+  }, [selectedList, selectedProductIds]);
 
   // --- Handlers ---
   const openDecisionModal = (product: Product) => {
@@ -536,40 +590,38 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
     }
   };
 
-  // Grading Handlers
+  // Grade Handlers (Replaced Category Handlers)
   const handleBatchGradeApply = () => {
-    if (selectedProductIds.size === 0 || batchTargetStores.length === 0) return;
+    if (selectedProductIds.size === 0) return;
 
     const updatedList = selectedList.map(p => {
         if (!selectedProductIds.has(p.id)) return p; // Only update selected items
-
-        const newStores = [...p.stores];
         
-        batchTargetStores.forEach(targetStore => {
-            const existingStoreIndex = newStores.findIndex(s => s.storeName === targetStore);
-            if (existingStoreIndex >= 0) {
-                newStores[existingStoreIndex] = { ...newStores[existingStoreIndex], grade: batchGrade as any };
-            } else {
-                newStores.push({ storeName: targetStore, grade: batchGrade as any });
-            }
-        });
+        let newStores = [...p.stores];
+        const existingStoreIndex = newStores.findIndex(s => s.storeName === batchTargetStore);
+        
+        if (existingStoreIndex >= 0) {
+          // Update existing
+          newStores[existingStoreIndex] = { ...newStores[existingStoreIndex], grade: batchTargetGrade as any };
+        } else {
+          // Add new
+          newStores.push({ storeName: batchTargetStore, grade: batchTargetGrade as any });
+        }
         
         return { ...p, stores: newStores };
     });
     setSelectedList(updatedList);
   };
 
-  const handleIndividualGrade = (productId: string, store: string, grade: string) => {
+  const handleIndividualCategoryChange = (productId: string, newCategory: string) => {
     const updatedList = selectedList.map(p => {
         if (p.id !== productId) return p;
-        const newStores = [...p.stores];
-        const existingStoreIndex = newStores.findIndex(s => s.storeName === store);
-        if (existingStoreIndex >= 0) {
-             newStores[existingStoreIndex] = { ...newStores[existingStoreIndex], grade: grade as any };
-        } else {
-             newStores.push({ storeName: store, grade: grade as any });
+        const parts = p.categoryPath.split('>>');
+        if (parts.length > 1) {
+            parts[parts.length - 1] = newCategory;
+            return { ...p, categoryPath: parts.join('>>') };
         }
-        return { ...p, stores: newStores };
+        return { ...p, categoryPath: newCategory };
     });
     setSelectedList(updatedList);
   };
@@ -603,7 +655,8 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
     <div className="relative flex h-full p-1 overflow-hidden">
       {/* LEFT PANEL: MAIN BROWSER */}
       <div className={`flex-1 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-full ring-1 ring-slate-900/5 transition-all duration-300 ease-in-out ${showMoodBoard ? 'mr-4' : 'mr-0'}`}>
-         {/* Header Tabs - NEW FEATURE */}
+         {/* ... (Header Tabs and content remain the same) ... */}
+         {/* Header Tabs */}
          <div className="flex flex-col border-b border-slate-100 bg-white sticky top-0 z-20">
              <div className="px-5 pt-4 pb-0 flex justify-between items-end">
                  <div className="flex gap-6">
@@ -658,12 +711,51 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
                         }`}
                     >
                         {showMoodBoard ? <PanelRightClose size={14} /> : <PanelRightOpen size={14} />}
-                        {showMoodBoard ? '收起搭配' : '搭配预览'}
+                        {showMoodBoard ? '收起预选区' : '预选区'}
                     </button>
                     <button className="bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-2 shadow-sm">
                         <Download size={14} /> 批量导出
                     </button>
                  </div>
+             </div>
+             
+             {/* Filter Section */}
+             <div className="px-5 py-3 border-t border-slate-100 bg-slate-50/50 flex items-center gap-3">
+                 <div className="flex items-center gap-2 text-xs text-slate-500 mr-2">
+                     <Filter size={14} /> 筛选:
+                 </div>
+                 
+                 <div className="relative group min-w-[120px]">
+                     <select 
+                        value={activeFilters.productLine}
+                        onChange={(e) => setActiveFilters(prev => ({ ...prev, productLine: e.target.value }))}
+                        className="w-full h-8 text-xs text-slate-600 bg-white border border-slate-200 rounded px-2 focus:outline-none focus:ring-1 focus:ring-blue-400 cursor-pointer hover:border-slate-300"
+                     >
+                         <option value="">全部产品线</option>
+                         {productLines.map(line => <option key={line} value={line}>{line}</option>)}
+                     </select>
+                 </div>
+
+                 <div className="relative group min-w-[120px]">
+                     <select 
+                        value={activeFilters.planningDeveloper}
+                        onChange={(e) => setActiveFilters(prev => ({ ...prev, planningDeveloper: e.target.value }))}
+                        className="w-full h-8 text-xs text-slate-600 bg-white border border-slate-200 rounded px-2 focus:outline-none focus:ring-1 focus:ring-blue-400 cursor-pointer hover:border-slate-300"
+                     >
+                         <option value="">全部企划开发员</option>
+                         {planners.map(planner => <option key={planner} value={planner}>{planner}</option>)}
+                     </select>
+                 </div>
+
+                 {/* Reset Filter Button */}
+                 {(activeFilters.productLine || activeFilters.planningDeveloper) && (
+                     <button 
+                        onClick={() => setActiveFilters(prev => ({ ...prev, productLine: '', planningDeveloper: '' }))}
+                        className="text-[10px] text-blue-600 hover:underline px-2"
+                     >
+                         清除筛选
+                     </button>
+                 )}
              </div>
          </div>
 
@@ -688,6 +780,7 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
                         // Dynamic Icon: Plus for Pool, Edit for others
                         actionIcon={viewMode === 'pool' ? <Plus size={18} /> : <Edit size={14} />}
                         actionClass={viewMode === 'pool' ? "bg-slate-900 text-white hover:bg-blue-600" : "bg-white text-slate-500 border border-slate-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"}
+                        showDetails={viewMode !== 'pool'}
                     />
                 ))}
                 {displayedProducts.length === 0 && (
@@ -728,7 +821,7 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
          </div>
       </div>
 
-      {/* RIGHT PANEL: Mood Board Sidebar */}
+      {/* RIGHT PANEL: Pre-selection Area (Mood Board) */}
       <div 
         className={`flex-none bg-white rounded-2xl shadow-xl border border-slate-200 flex flex-col transition-all duration-300 ease-in-out transform origin-right overflow-hidden ${
           showMoodBoard ? 'w-80 translate-x-0 opacity-100' : 'w-0 translate-x-10 opacity-0'
@@ -736,7 +829,7 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
       >
           <div className="flex justify-between items-center px-4 py-4 border-b border-slate-100 bg-white sticky top-0 z-10">
               <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-slate-800">搭配预览</span>
+                  <span className="text-sm font-bold text-slate-800">预选区</span>
                   <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">{selectedList.length}</span>
               </div>
               <div className="flex items-center gap-1">
@@ -756,7 +849,7 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
           <div className="px-4 py-2 bg-slate-50/50 border-b border-slate-100">
               <span className="text-[10px] text-slate-500 flex items-center gap-1">
                   <GripHorizontal size={12} />
-                  拖拽图片可调整搭配顺序
+                  拖拽图片可调整预选顺序
               </span>
           </div>
 
@@ -819,20 +912,20 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
       {isMaximized && createPortal(
           <div className="fixed inset-0 z-[100] bg-slate-100/95 backdrop-blur-sm flex flex-col animate-in fade-in zoom-in-95 duration-200">
               {/* Header */}
-              <div className="bg-white border-b border-slate-200 px-6 py-4 shadow-sm z-20">
+              <div className="bg-white border-b border-slate-200 px-6 py-4 shadow-sm z-20 flex-none">
                   <div className="flex justify-between items-center">
                       <div className="flex items-center gap-6">
                         <div>
                             <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                                <Shirt className="text-blue-600" /> 搭配预览详情
+                                <Shirt className="text-blue-600" /> 预选区详情
                             </h2>
                             <p className="text-slate-500 text-sm mt-1 flex items-center gap-2">
                                 <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-xs font-bold">{selectedList.length} Items</span>
-                                勾选图片后可批量定级
+                                勾选图片后可批量设置门店定级
                             </p>
                         </div>
 
-                         {/* Batch Action Toolbar */}
+                         {/* Batch Action Toolbar - Changed to Grade */}
                         <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-inner">
                             <div className="flex items-center gap-1 border-r border-slate-200 pr-3 mr-1">
                                 <button 
@@ -853,175 +946,258 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
 
                             <span className="text-xs font-bold text-slate-500">批量定级:</span>
                             <div className="flex items-center gap-2">
-                                <div className="w-[160px]">
-                                    <MultiSelect 
-                                        options={STORES} 
-                                        value={batchTargetStores} 
-                                        onChange={setBatchTargetStores} 
-                                        placeholder="选择门店" 
-                                    />
-                                </div>
                                 <select 
-                                    value={batchGrade} 
-                                    onChange={(e) => setBatchGrade(e.target.value)}
-                                    className="text-xs border border-slate-300 rounded px-2 py-1.5 bg-white focus:ring-blue-500 focus:border-blue-500 font-bold cursor-pointer disabled:opacity-50 min-w-[60px]"
+                                    value={batchTargetStore} 
+                                    onChange={(e) => setBatchTargetStore(e.target.value)}
+                                    className="text-xs border border-slate-300 rounded px-2 py-1.5 bg-white focus:ring-blue-500 focus:border-blue-500 cursor-pointer disabled:opacity-50 max-w-[120px] truncate"
+                                    disabled={selectedProductIds.size === 0}
+                                >
+                                    {STORES.map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                                <select 
+                                    value={batchTargetGrade} 
+                                    onChange={(e) => setBatchTargetGrade(e.target.value)}
+                                    className="text-xs border border-slate-300 rounded px-2 py-1.5 bg-white focus:ring-blue-500 focus:border-blue-500 cursor-pointer disabled:opacity-50 w-[50px]"
                                     disabled={selectedProductIds.size === 0}
                                 >
                                     {GRADES.map(g => <option key={g} value={g}>{g}</option>)}
                                 </select>
                                 <button 
                                     onClick={handleBatchGradeApply}
-                                    disabled={selectedProductIds.size === 0 || batchTargetStores.length === 0}
+                                    disabled={selectedProductIds.size === 0}
                                     className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-xs px-3 py-1.5 rounded font-medium transition-colors"
                                 >
                                     <Zap size={12} /> 应用
+                                </button>
+
+                                {/* Show/Hide Stats Button moved here */}
+                                <button 
+                                    onClick={() => setShowStats(!showStats)}
+                                    className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-colors border ml-1
+                                        ${showStats ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}
+                                    `}
+                                    title={showStats ? 'Hide Statistics' : 'Show Statistics'}
+                                >
+                                    <BarChart3 size={14} /> 统计
                                 </button>
                             </div>
                         </div>
                       </div>
 
                       <div className="flex gap-3 items-center">
-                          {/* Toggle Stats */}
+                          {/* Save buttons */}
                           <button 
-                             onClick={() => setShowStats(!showStats)}
-                             className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-colors border
-                                ${showStats ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}
-                             `}
+                             className="flex items-center gap-2 px-4 py-2 bg-white text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm text-sm font-medium"
                           >
-                              <BarChart3 size={14} /> {showStats ? '隐藏统计' : '定级统计'}
+                              <Save size={16} /> 保存至草稿
                           </button>
+                          
+                          <button 
+                             className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors shadow-md text-sm font-medium"
+                          >
+                              <Send size={16} /> 保存并提交
+                          </button>
+                          
+                          <div className="w-px h-6 bg-slate-300 mx-1"></div>
 
-                          <button onClick={() => setIsMaximized(false)} className="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition-colors">
+                          <button onClick={() => setIsMaximized(false)} className="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition-colors" title="退出全屏">
                               <Minimize2 size={24} />
                           </button>
                       </div>
                   </div>
+              </div>
 
-                  {/* Stats Panel */}
+              {/* Main Content Area (Canvas + Sidebar) */}
+              <div className="flex-1 flex overflow-hidden">
+                  
+                  {/* Canvas (Left) */}
+                  <div className="flex-1 overflow-y-auto p-10 bg-slate-50/50">
+                      <div className="max-w-7xl mx-auto">
+                          {selectedList.length > 0 ? (
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                                {selectedList.map((product, index) => {
+                                    const isSelected = selectedProductIds.has(product.id);
+                                    // Extract the leaf category from the path or default to first part
+                                    const currentCategory = product.categoryPath.split('>>').pop() || '';
+                                    const matchedCategory = CATEGORIES.includes(currentCategory) ? currentCategory : '';
+
+                                    return (
+                                    <div 
+                                        key={product.id}
+                                        draggable
+                                        onDragStart={(e) => handleDragStart(e, index)}
+                                        onDragOver={handleDragOver}
+                                        onDrop={(e) => handleDrop(e, index)}
+                                        onClick={() => toggleSelection(product.id)}
+                                        className={`group relative bg-white rounded-xl shadow-sm border overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 flex flex-col
+                                            ${draggedIndex === index ? 'opacity-40 scale-95 ring-4 ring-blue-100 border-blue-400 border-dashed' : ''}
+                                            ${isSelected ? 'ring-2 ring-blue-500 border-blue-500' : 'border-slate-200 hover:border-blue-300'}
+                                        `}
+                                    >
+                                        {/* Selection Checkbox Overlay */}
+                                        <div className={`absolute top-2 left-2 z-20 w-5 h-5 rounded border bg-white flex items-center justify-center transition-all duration-200
+                                            ${isSelected ? 'border-blue-500 bg-blue-500 text-white' : 'border-slate-300 text-transparent hover:border-blue-400'}
+                                        `}>
+                                            <Check size={12} strokeWidth={3} />
+                                        </div>
+
+                                        {/* Image Area */}
+                                        <div className="relative aspect-[3/4] overflow-hidden bg-slate-100">
+                                            <img src={product.imageUrl} className="w-full h-full object-cover pointer-events-none select-none" />
+                                            
+                                            <div className="absolute top-2 right-2 flex flex-col gap-2 z-20">
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        const newSelected = selectedList.filter(p => p.id !== product.id);
+                                                        setSelectedList(newSelected);
+                                                        setPoolList([product, ...poolList]);
+                                                        if (selectedProductIds.has(product.id)) {
+                                                            const newIds = new Set(selectedProductIds);
+                                                            newIds.delete(product.id);
+                                                            setSelectedProductIds(newIds);
+                                                        }
+                                                    }}
+                                                    className="w-8 h-8 rounded-full bg-white/90 backdrop-blur text-slate-400 hover:bg-red-50 hover:text-red-600 flex items-center justify-center shadow-sm"
+                                                    title="移除"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+
+                                            <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur text-white text-[10px] px-1.5 py-0.5 rounded">
+                                                {product.skc}
+                                            </div>
+                                        </div>
+
+                                        {/* Individual Category Area */}
+                                        <div className="p-3 bg-white flex-1 flex flex-col gap-2 border-t border-slate-100" onClick={(e) => e.stopPropagation()}>
+                                            <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                                                <Tag size={10} /> 产品分类
+                                            </div>
+                                            <div className="flex items-center justify-between text-xs">
+                                                 <select 
+                                                    value={matchedCategory || currentCategory}
+                                                    onChange={(e) => handleIndividualCategoryChange(product.id, e.target.value)}
+                                                    className="w-full border border-slate-200 rounded px-2 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+                                                 >
+                                                    {CATEGORIES.map(c => (
+                                                        <option key={c} value={c}>{c}</option>
+                                                    ))}
+                                                    {/* Fallback option if current category is not in list */}
+                                                    {!CATEGORIES.includes(currentCategory) && currentCategory && (
+                                                        <option value={currentCategory}>{currentCategory}</option>
+                                                    )}
+                                                 </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    )
+                                })}
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center h-[60vh] text-slate-300 border-2 border-dashed border-slate-300 rounded-3xl bg-slate-50">
+                                <Shirt size={64} className="opacity-20 mb-4" />
+                                <h3 className="text-xl font-bold text-slate-400">暂无预选商品</h3>
+                                <p className="text-slate-400 mt-2">请关闭全屏模式，从左侧商品库添加</p>
+                                <button onClick={() => setIsMaximized(false)} className="mt-6 px-6 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 shadow-sm font-medium transition-colors">
+                                    返回选品列表
+                                </button>
+                            </div>
+                          )}
+                      </div>
+                  </div>
+
+                  {/* Stats Sidebar (Right) */}
                   {showStats && (
-                      <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 gap-8 animate-in slide-in-from-top-2 duration-200">
-                          {STORES.map(store => (
-                              <div key={store} className="flex items-center gap-4">
-                                  <span className="text-xs font-bold text-slate-600 w-24 truncate" title={store}>{store}</span>
-                                  <div className="flex flex-1 gap-2">
-                                      {GRADES.filter(g => g !== 'D').map(grade => (
-                                          <div key={grade} className="flex items-center bg-slate-50 border border-slate-200 rounded px-2 py-1 min-w-[3rem] justify-between">
-                                              <span className={`text-[10px] font-bold mr-2 ${
-                                                  grade === 'S' ? 'text-red-500' : 
-                                                  grade === 'A' ? 'text-orange-500' : 
-                                                  grade === 'B' ? 'text-blue-500' : 'text-slate-400'
-                                              }`}>{grade}</span>
-                                              <span className="text-xs font-mono text-slate-700">{gradeStats[store]?.[grade] || 0}</span>
-                                          </div>
-                                      ))}
-                                  </div>
-                              </div>
-                          ))}
+                      <div className="w-96 bg-white border-l border-slate-200 flex flex-col shadow-lg animate-in slide-in-from-right duration-300 z-10">
+                           {/* Summary Section */}
+                           <div className={`p-5 border-b border-slate-100 flex-none ${selectedProductIds.size > 0 ? 'bg-blue-50/40' : 'bg-white'}`}>
+                               <div className="flex items-center justify-between mb-4">
+                                   <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                       <BarChart3 size={16} /> 统计概览
+                                   </h3>
+                                   {selectedProductIds.size > 0 && (
+                                       <span className="text-[10px] text-slate-400 italic">
+                                           (已选 {selectedProductIds.size} 款)
+                                       </span>
+                                   )}
+                               </div>
+
+                               <div className="space-y-3">
+                                   {/* Metrics Rows */}
+                                   <div className="flex items-center justify-between p-2 bg-white rounded border border-slate-200 shadow-sm">
+                                       <span className="text-xs text-slate-500">选中商品</span>
+                                       <span className="text-sm font-bold text-slate-800">
+                                           {selectedProductIds.size > 0 ? selectedProductIds.size : selectedList.length}
+                                       </span>
+                                   </div>
+                                   <div className="flex items-center justify-between p-2 bg-white rounded border border-slate-200 shadow-sm">
+                                       <span className="text-xs text-slate-500">覆盖门店</span>
+                                       <span className="text-sm font-bold text-slate-800">
+                                           {Object.keys(gradeStats).filter(s => Object.values(gradeStats[s]).some(v => v > 0)).length} / {STORES.length}
+                                       </span>
+                                   </div>
+                                   
+                                   {/* Grades Grid */}
+                                   <div className="grid grid-cols-4 gap-2 mt-2">
+                                       {['S', 'A', 'B', 'C'].map(g => {
+                                           const total = Object.values(gradeStats).reduce((acc, storeStat) => acc + (storeStat[g] || 0), 0);
+                                           const style = g === 'S' ? 'bg-red-50 text-red-600 border-red-100' :
+                                                       g === 'A' ? 'bg-orange-50 text-orange-600 border-orange-100' :
+                                                       g === 'B' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                       'bg-slate-50 text-slate-600 border-slate-200';
+                                           return (
+                                               <div key={g} className={`p-1.5 rounded border text-center flex flex-col items-center ${style}`}>
+                                                   <span className="text-[10px] opacity-70 font-bold">{g}</span>
+                                                   <span className="text-sm font-bold leading-tight">{total}</span>
+                                               </div>
+                                           )
+                                       })}
+                                   </div>
+                               </div>
+                           </div>
+
+                           {/* Table Section */}
+                           <div className="flex-1 flex flex-col min-h-0 bg-white">
+                               <div className="px-5 py-3 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                                   <span className="text-xs font-bold text-slate-600">门店定级明细</span>
+                               </div>
+                               <div className="flex-1 overflow-y-auto custom-scrollbar p-0">
+                                  <table className="w-full text-[10px] border-collapse">
+                                      <thead className="sticky top-0 bg-slate-50 shadow-sm z-10 text-slate-500">
+                                          <tr>
+                                              <th className="px-4 py-2 text-left font-semibold border-b border-slate-100">门店</th>
+                                              <th className="px-1 py-2 text-center font-bold text-red-500 w-8 border-b border-slate-100">S</th>
+                                              <th className="px-1 py-2 text-center font-bold text-orange-500 w-8 border-b border-slate-100">A</th>
+                                              <th className="px-1 py-2 text-center font-bold text-blue-500 w-8 border-b border-slate-100">B</th>
+                                              <th className="px-1 py-2 text-center font-bold text-slate-500 w-8 border-b border-slate-100">C</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody className="divide-y divide-slate-50">
+                                          {STORES.map(store => {
+                                              const sCount = gradeStats[store]?.['S'] || 0;
+                                              const aCount = gradeStats[store]?.['A'] || 0;
+                                              const bCount = gradeStats[store]?.['B'] || 0;
+                                              const cCount = gradeStats[store]?.['C'] || 0;
+                                              const hasData = sCount + aCount + bCount + cCount > 0;
+                                              
+                                              return (
+                                                  <tr key={store} className={`hover:bg-slate-50 transition-colors ${hasData ? 'bg-white' : 'bg-slate-50/20 text-slate-300'}`}>
+                                                      <td className="px-4 py-2 font-medium truncate max-w-[120px]" title={store}>{store}</td>
+                                                      <td className={`px-1 py-2 text-center ${sCount ? 'text-red-600 font-bold bg-red-50/50' : ''}`}>{sCount || '-'}</td>
+                                                      <td className={`px-1 py-2 text-center ${aCount ? 'text-orange-600 font-bold bg-orange-50/50' : ''}`}>{aCount || '-'}</td>
+                                                      <td className={`px-1 py-2 text-center ${bCount ? 'text-blue-600 font-bold bg-blue-50/50' : ''}`}>{bCount || '-'}</td>
+                                                      <td className={`px-1 py-2 text-center ${cCount ? 'text-slate-600 font-bold bg-slate-100/50' : ''}`}>{cCount || '-'}</td>
+                                                  </tr>
+                                              );
+                                          })}
+                                      </tbody>
+                                  </table>
+                               </div>
+                           </div>
                       </div>
                   )}
-              </div>
-              
-              {/* Canvas */}
-              <div className="flex-1 overflow-y-auto p-10 bg-slate-50/50">
-                  <div className="max-w-7xl mx-auto">
-                      {selectedList.length > 0 ? (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                            {selectedList.map((product, index) => {
-                                const isSelected = selectedProductIds.has(product.id);
-                                return (
-                                <div 
-                                    key={product.id}
-                                    draggable
-                                    onDragStart={(e) => handleDragStart(e, index)}
-                                    onDragOver={handleDragOver}
-                                    onDrop={(e) => handleDrop(e, index)}
-                                    onClick={() => toggleSelection(product.id)}
-                                    className={`group relative bg-white rounded-xl shadow-sm border overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 flex flex-col
-                                        ${draggedIndex === index ? 'opacity-40 scale-95 ring-4 ring-blue-100 border-blue-400 border-dashed' : ''}
-                                        ${isSelected ? 'ring-2 ring-blue-500 border-blue-500' : 'border-slate-200 hover:border-blue-300'}
-                                    `}
-                                >
-                                    {/* Selection Checkbox Overlay */}
-                                    <div className={`absolute top-2 left-2 z-20 w-5 h-5 rounded border bg-white flex items-center justify-center transition-all duration-200
-                                        ${isSelected ? 'border-blue-500 bg-blue-500 text-white' : 'border-slate-300 text-transparent hover:border-blue-400'}
-                                    `}>
-                                        <Check size={12} strokeWidth={3} />
-                                    </div>
-
-                                    {/* Image Area */}
-                                    <div className="relative aspect-[3/4] overflow-hidden bg-slate-100">
-                                        <img src={product.imageUrl} className="w-full h-full object-cover pointer-events-none select-none" />
-                                        
-                                        <div className="absolute top-2 right-2 flex flex-col gap-2 z-20">
-                                            <button 
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    const newSelected = selectedList.filter(p => p.id !== product.id);
-                                                    setSelectedList(newSelected);
-                                                    setPoolList([product, ...poolList]);
-                                                    if (selectedProductIds.has(product.id)) {
-                                                        const newIds = new Set(selectedProductIds);
-                                                        newIds.delete(product.id);
-                                                        setSelectedProductIds(newIds);
-                                                    }
-                                                }}
-                                                className="w-8 h-8 rounded-full bg-white/90 backdrop-blur text-slate-400 hover:bg-red-50 hover:text-red-600 flex items-center justify-center shadow-sm"
-                                                title="移除"
-                                            >
-                                                <Trash2 size={14} />
-                                            </button>
-                                        </div>
-
-                                        <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur text-white text-[10px] px-1.5 py-0.5 rounded">
-                                            {product.skc}
-                                        </div>
-                                    </div>
-
-                                    {/* Individual Grading Area */}
-                                    <div className="p-3 bg-white flex-1 flex flex-col gap-2 border-t border-slate-100" onClick={(e) => e.stopPropagation()}>
-                                        <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                                            <Settings size={10} /> 门店定级
-                                        </div>
-                                        {STORES.map(store => {
-                                            const currentGrade = product.stores.find(s => s.storeName === store)?.grade;
-                                            return (
-                                                <div key={store} className="flex items-center justify-between text-xs">
-                                                    <span className="text-slate-600 truncate max-w-[60%]" title={store}>{store}</span>
-                                                    <select 
-                                                        value={currentGrade || ''} 
-                                                        onChange={(e) => handleIndividualGrade(product.id, store, e.target.value)}
-                                                        className={`border rounded px-1 py-0.5 text-xs font-bold cursor-pointer focus:ring-1 focus:ring-blue-500 outline-none
-                                                            ${!currentGrade ? 'text-slate-400 border-slate-200' : 
-                                                              currentGrade === 'S' ? 'text-red-600 bg-red-50 border-red-200' :
-                                                              currentGrade === 'A' ? 'text-orange-600 bg-orange-50 border-orange-200' :
-                                                              currentGrade === 'B' ? 'text-blue-600 bg-blue-50 border-blue-200' :
-                                                              'text-slate-700 border-slate-200'}
-                                                        `}
-                                                    >
-                                                        <option value="">-</option>
-                                                        {GRADES.map(g => (
-                                                            <option key={g} value={g}>{g}</option>
-                                                        ))}
-                                                    </select>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                </div>
-                                )
-                            })}
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center h-[60vh] text-slate-300 border-2 border-dashed border-slate-300 rounded-3xl bg-slate-50">
-                            <Shirt size={64} className="opacity-20 mb-4" />
-                            <h3 className="text-xl font-bold text-slate-400">暂无搭配商品</h3>
-                            <p className="text-slate-400 mt-2">请关闭全屏模式，从左侧商品库添加</p>
-                            <button onClick={() => setIsMaximized(false)} className="mt-6 px-6 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 shadow-sm font-medium transition-colors">
-                                返回选品列表
-                            </button>
-                        </div>
-                      )}
-                  </div>
               </div>
           </div>,
           document.body

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Product } from '../types';
-import { ArrowRight, Clock, User } from 'lucide-react';
+import { ArrowRight, Clock, User, Layers } from 'lucide-react';
 
 interface ProductTableProps {
   products: Product[];
@@ -95,6 +95,17 @@ const ProductHoverPreview: React.FC<{ product: Product; children: React.ReactNod
                         <span className="text-slate-400 uppercase text-[10px] font-bold tracking-wider">Drop</span>
                         <span className="text-slate-800 font-medium">{product.drop}</span>
                     </div>
+
+                    {/* New Row: Drop Goal & Passed Count */}
+                    <div className="flex flex-col gap-0.5">
+                        <span className="text-slate-400 uppercase text-[10px] font-bold tracking-wider">Drop Goal</span>
+                        <span className="text-slate-800 font-medium">{product.dropGoal || '-'}</span>
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                        <span className="text-slate-400 uppercase text-[10px] font-bold tracking-wider">Passed Count</span>
+                        <span className="text-slate-800 font-medium">{product.developedCount || '-'}</span>
+                    </div>
+
                     <div className="flex flex-col gap-0.5 col-span-2">
                         <span className="text-slate-400 uppercase text-[10px] font-bold tracking-wider">Planning Developer</span>
                         <span className="text-purple-600 font-medium">{product.planningDeveloper}</span>
@@ -158,14 +169,14 @@ const ProductHoverPreview: React.FC<{ product: Product; children: React.ReactNod
                                         
                                         const grades = ['S', 'A', 'B', 'C', 'D'];
                                         
-                                        return grades.map(g => {
+                                        return grades.filter(g => g !== 'D').map(g => {
                                             if (!grouped[g]) return null;
                                             return (
                                                 <div key={g} className="flex items-start text-[11px] leading-tight">
                                                     <span className={`font-bold mr-2 w-4 h-4 rounded flex items-center justify-center text-[9px] flex-shrink-0 ${
                                                          g === 'S' ? 'bg-red-50 text-red-600 border border-red-100' : 
                                                          g === 'A' ? 'bg-orange-50 text-orange-600 border border-orange-100' : 
-                                                         g === 'B' ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-slate-100 text-slate-500 border border-slate-200'
+                                                         g === 'B' ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-slate-100 text-slate-500 border-slate-200'
                                                     }`}>{g}</span>
                                                     <span className="text-slate-600 pt-0.5">{grouped[g].join('、')}</span>
                                                 </div>
@@ -237,6 +248,16 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDecision }) => 
                      <Clock size={10} /> 
                      Plan: <span className="text-slate-600">{product.planDate}</span>
                    </div>
+                   
+                   {/* NEW: Product Line & Planner */}
+                   <div className="flex flex-wrap gap-1 mt-1">
+                      <span className="inline-flex items-center gap-1 text-[10px] text-slate-600 bg-slate-50 border border-slate-100 px-1.5 py-0.5 rounded">
+                        <Layers size={9} className="text-slate-400" /> {product.productLine}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-[10px] text-slate-600 bg-slate-50 border border-slate-100 px-1.5 py-0.5 rounded">
+                        <User size={9} className="text-slate-400" /> {product.planningDeveloper}
+                      </span>
+                   </div>
                 </div>
               </td>
               <td className="p-4 align-top">
@@ -260,17 +281,8 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDecision }) => 
                         <span className="text-slate-400 text-[10px]">Price</span>
                         <span className="font-bold text-slate-900">${product.price.toFixed(1)}</span>
                     </div>
-                     <div className="flex justify-between items-center w-32">
-                        <span className="text-slate-400 text-[10px]">Line</span>
-                        <span className="text-slate-700">{product.productLine}</span>
-                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 mt-2">
-                     <div className="w-5 h-5 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-[10px] font-bold">
-                        {product.planningDeveloper.charAt(0)}
-                     </div>
-                     <span className="text-slate-600 text-[11px]">{product.planningDeveloper}</span>
-                  </div>
+                  {/* Removed duplicates from Details column since added to Product Info */}
                 </div>
               </td>
               <td className="p-4 align-top">

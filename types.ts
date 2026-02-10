@@ -19,6 +19,8 @@ export interface Product {
   operator: string;
   createdTime: string;
   selectionTime: string;
+  dropGoal?: string; // New: Drop上新目标
+  developedCount?: number; // New: 已开款数量
 }
 
 export interface StoreGrade {

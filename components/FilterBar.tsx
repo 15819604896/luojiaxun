@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, ChevronDown, Calendar, Filter, Check } from 'lucide-react';
+import { PRODUCT_LINES, PLANNING_DEVELOPERS } from '../constants';
 
 interface FilterBarProps {
   onSearch: () => void;
@@ -117,8 +118,6 @@ const FilterBar: React.FC<FilterBarProps> = ({ onSearch, onReset }) => {
             { label: '产品分类', placeholder: '全部分类' },
             { label: '选品状态', placeholder: '全部状态' },
             { label: '开发单状态', placeholder: '全部状态' },
-            { label: '产品线', placeholder: '全部产品线' },
-            { label: '企划开发员', placeholder: '全部人员' },
             { label: '开款渠道', placeholder: '全部渠道' }
         ].map((filter, index) => (
              <div key={index} className="relative group">
@@ -132,6 +131,34 @@ const FilterBar: React.FC<FilterBarProps> = ({ onSearch, onReset }) => {
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-3.5 pointer-events-none group-hover:text-slate-600 transition-colors" />
             </div>
         ))}
+
+        {/* Product Line Filter */}
+        <div className="relative group">
+            <label className="absolute -top-2 left-2 px-1 bg-white text-[10px] font-medium text-slate-400 group-focus-within:text-blue-500 transition-colors z-10">
+                产品线
+            </label>
+            <select className="w-full h-10 text-xs text-slate-600 bg-white border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all appearance-none cursor-pointer hover:border-slate-300">
+                <option value="">全部产品线</option>
+                {PRODUCT_LINES.map(line => (
+                  <option key={line} value={line}>{line}</option>
+                ))}
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-3.5 pointer-events-none group-hover:text-slate-600 transition-colors" />
+        </div>
+
+        {/* Planner Filter */}
+        <div className="relative group">
+            <label className="absolute -top-2 left-2 px-1 bg-white text-[10px] font-medium text-slate-400 group-focus-within:text-blue-500 transition-colors z-10">
+                企划开发员
+            </label>
+            <select className="w-full h-10 text-xs text-slate-600 bg-white border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all appearance-none cursor-pointer hover:border-slate-300">
+                <option value="">全部人员</option>
+                {PLANNING_DEVELOPERS.map(planner => (
+                  <option key={planner} value={planner}>{planner}</option>
+                ))}
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-3.5 pointer-events-none group-hover:text-slate-600 transition-colors" />
+        </div>
 
         {/* New Multi-select Store Filter */}
         <MultiSelect 
