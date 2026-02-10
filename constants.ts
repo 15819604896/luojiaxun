@@ -47,7 +47,7 @@ export const MOCK_PRODUCTS: Product[] = [
     drop: '202601W1-RF-S',
     planDate: '2026-01-03',
     imageUrl: getImage(0),
-    categoryPath: 'Cider>>女装>>常规码>>外套',
+    categoryPath: 'Cider>>女装>>常规码>>毛织>>毛织连体裤',
     price: 92.9,
     productLine: '常规码',
     stores: [
@@ -72,7 +72,7 @@ export const MOCK_PRODUCTS: Product[] = [
     drop: '202601W1-RF-S',
     planDate: '2026-01-03',
     imageUrl: getImage(1),
-    categoryPath: 'Cider>>女装>>常规码>>上衣',
+    categoryPath: 'Cider>>女装>>常规码>>毛织>>分体毛织套装>>毛织套装下装',
     price: 45.0,
     productLine: '常规码',
     stores: [
@@ -96,7 +96,7 @@ export const MOCK_PRODUCTS: Product[] = [
     drop: '202601W1-RF-S',
     planDate: '2026-01-03',
     imageUrl: getImage(2),
-    categoryPath: 'Cider>>女装>>常规码>>连衣裙',
+    categoryPath: 'Cider>>女装>>常规码>>毛织>>分体毛织套装>>毛织套装上装',
     price: 120.5,
     productLine: '常规码',
     stores: [
@@ -120,7 +120,7 @@ export const MOCK_PRODUCTS: Product[] = [
     drop: '202601W1-RF-S',
     planDate: '2026-01-03',
     imageUrl: getImage(3),
-    categoryPath: 'Cider>>女装>>常规码>>裤装',
+    categoryPath: 'Cider>>女装>>常规码>>牛仔>>牛仔衬衣',
     price: 68.0,
     productLine: '常规码',
     stores: [

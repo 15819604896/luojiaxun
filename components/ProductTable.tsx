@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Product } from '../types';
+import { ArrowRight, Clock, User } from 'lucide-react';
 
 interface ProductTableProps {
   products: Product[];
@@ -8,111 +10,283 @@ interface ProductTableProps {
 
 const GradeBadge: React.FC<{ grade: string }> = ({ grade }) => {
   const colors: Record<string, string> = {
-    S: 'bg-red-500',
-    A: 'bg-orange-500',
-    B: 'bg-blue-500',
-    C: 'bg-gray-500',
-    D: 'bg-gray-400',
+    S: 'bg-red-50 text-red-600 border-red-100',
+    A: 'bg-orange-50 text-orange-600 border-orange-100',
+    B: 'bg-blue-50 text-blue-600 border-blue-100',
+    C: 'bg-slate-100 text-slate-600 border-slate-200',
+    D: 'bg-slate-100 text-slate-400 border-slate-200',
   };
   return (
-    <span className={`${colors[grade] || 'bg-gray-400'} text-white w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold mr-2 flex-shrink-0`}>
+    <span className={`${colors[grade] || 'bg-gray-100 text-gray-500'} w-6 h-6 flex items-center justify-center rounded-lg text-[11px] font-bold border shadow-sm`}>
       {grade}
     </span>
   );
 };
 
+const ProductHoverPreview: React.FC<{ product: Product; children: React.ReactNode }> = ({ product, children }) => {
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseEnter = () => {
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      
+      let top = rect.top - 50; 
+      let left = rect.right + 20;
+      
+      if (left + 320 > viewportWidth) {
+          left = rect.left - 340;
+      }
+      if (top + 480 > viewportHeight) {
+          top = Math.max(10, viewportHeight - 490);
+      }
+
+      setCoords({ top, left });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setCoords(null);
+  };
+
+  return (
+    <>
+      <div 
+        ref={triggerRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className="w-full h-full"
+      >
+        {children}
+      </div>
+      {coords && createPortal(
+        <div 
+            className="fixed z-[9999] w-[320px] bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-200 pointer-events-none text-slate-700 font-sans"
+            style={{ top: coords.top, left: coords.left }}
+        >
+             <div className="relative h-56 w-full bg-slate-100">
+                <img src={product.imageUrl} className="w-full h-full object-cover" alt={product.skc} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90"></div>
+                
+                <div className="absolute top-3 left-3 flex gap-1">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold shadow-sm backdrop-blur-sm
+                        ${product.selectionStatus === 'Selected' ? 'bg-green-500/90 text-white' : 
+                          product.selectionStatus === 'Rejected' ? 'bg-red-500/90 text-white' : 'bg-yellow-500/90 text-white'}
+                    `}>
+                        {product.selectionStatus}
+                    </span>
+                </div>
+                
+                <div className="absolute bottom-3 left-3 right-3">
+                   <div className="text-white font-bold text-base truncate tracking-tight">{product.skc}</div>
+                   <div className="text-white/80 text-xs truncate">{product.categoryPath}</div>
+                </div>
+             </div>
+
+             <div className="p-5 text-xs space-y-3">
+                 <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                    <div className="flex flex-col gap-0.5">
+                        <span className="text-slate-400 uppercase text-[10px] font-bold tracking-wider">Price</span>
+                        <span className="text-slate-800 font-medium text-sm">${product.price}</span>
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                        <span className="text-slate-400 uppercase text-[10px] font-bold tracking-wider">Drop</span>
+                        <span className="text-slate-800 font-medium">{product.drop}</span>
+                    </div>
+                    <div className="flex flex-col gap-0.5 col-span-2">
+                        <span className="text-slate-400 uppercase text-[10px] font-bold tracking-wider">Planning Developer</span>
+                        <span className="text-purple-600 font-medium">{product.planningDeveloper}</span>
+                    </div>
+                 </div>
+                 
+                 <div className="w-full h-px bg-slate-100 my-2"></div>
+
+                 <div className="space-y-2">
+                     <div className="flex justify-between">
+                         <span className="text-slate-400">选品ID</span> 
+                         <span className="font-mono text-slate-700">{product.id}</span>
+                     </div>
+                     <div className="flex justify-between">
+                         <span className="text-slate-400">创建时间</span> 
+                         <span className="font-mono text-slate-700">{product.createdTime.split(' ')[0]}</span>
+                     </div>
+                     <div className="flex justify-between">
+                         <span className="text-slate-400">Dev Unit</span> 
+                         <span className="font-mono text-slate-700">{product.devUnitId}</span>
+                     </div>
+                      <div className="flex justify-between">
+                         <span className="text-slate-400">Status</span> 
+                         <span className={product.devStatus === '已完成' ? 'text-green-600' : 'text-slate-700'}>{product.devStatus}</span>
+                     </div>
+                     <div className="flex justify-between">
+                         <span className="text-slate-400">Channel</span> 
+                         <span className="text-slate-700">{product.channel}</span>
+                     </div>
+                     <div className="flex justify-between">
+                         <span className="text-slate-400">Plan Date</span> 
+                         <span className="text-slate-700">{product.planDate}</span>
+                     </div>
+                 </div>
+
+                 {/* Extra fields for Selected Status */}
+                 {product.selectionStatus === 'Selected' && (
+                    <>
+                        <div className="w-full h-px bg-slate-100 my-2"></div>
+                        <div className="space-y-2">
+                             <div className="flex justify-between">
+                                <span className="text-slate-400">Selector</span>
+                                <span className="text-slate-700">{product.operator}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-slate-400">Time</span>
+                                <span className="text-slate-700 font-mono">{product.selectionTime}</span>
+                            </div>
+                        </div>
+
+                        {product.stores.length > 0 && (
+                             <div className="pt-2 mt-1">
+                                <span className="text-slate-400 block mb-1.5 uppercase text-[10px] font-bold tracking-wider">Est. Grades</span>
+                                <div className="space-y-1.5">
+                                    {(() => {
+                                        const grouped = product.stores.reduce((acc, store) => {
+                                            if (!acc[store.grade]) acc[store.grade] = [];
+                                            acc[store.grade].push(store.storeName);
+                                            return acc;
+                                        }, {} as Record<string, string[]>);
+                                        
+                                        const grades = ['S', 'A', 'B', 'C', 'D'];
+                                        
+                                        return grades.map(g => {
+                                            if (!grouped[g]) return null;
+                                            return (
+                                                <div key={g} className="flex items-start text-[11px] leading-tight">
+                                                    <span className={`font-bold mr-2 w-4 h-4 rounded flex items-center justify-center text-[9px] flex-shrink-0 ${
+                                                         g === 'S' ? 'bg-red-50 text-red-600 border border-red-100' : 
+                                                         g === 'A' ? 'bg-orange-50 text-orange-600 border border-orange-100' : 
+                                                         g === 'B' ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-slate-100 text-slate-500 border border-slate-200'
+                                                    }`}>{g}</span>
+                                                    <span className="text-slate-600 pt-0.5">{grouped[g].join('、')}</span>
+                                                </div>
+                                            );
+                                        });
+                                    })()}
+                                </div>
+                            </div>
+                        )}
+                    </>
+                 )}
+             </div>
+        </div>,
+        document.body
+      )}
+    </>
+  );
+};
+
 const ProductTable: React.FC<ProductTableProps> = ({ products, onDecision }) => {
   return (
-    <div className="bg-white border border-gray-200 shadow-sm rounded overflow-x-auto">
+    <div className="w-full">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="bg-gray-50 text-gray-700 font-medium text-xs border-b border-gray-200">
-            <th className="p-3 w-10 text-center"><input type="checkbox" /></th>
-            {onDecision && <th className="p-3 w-24">操作</th>}
-            <th className="p-3 w-48">基本信息</th>
-            <th className="p-3 w-20">SKC主图</th>
-            <th className="p-3 w-48">产品信息</th>
-            <th className="p-3 w-40">预估等级</th>
-            <th className="p-3 w-48">打版信息</th>
-            <th className="p-3 w-32">产品标签</th>
-            <th className="p-3 w-24">选品状态</th>
-            <th className="p-3 w-24">选品操作人</th>
-            <th className="p-3 w-32">时间</th>
+          <tr className="bg-slate-50/80 backdrop-blur sticky top-0 z-10 text-slate-500 font-semibold text-[11px] uppercase tracking-wider border-b border-slate-200">
+            <th className="p-4 w-10 text-center rounded-tl-lg">
+                <div className="flex items-center justify-center h-full">
+                    <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-3.5 w-3.5 cursor-pointer" />
+                </div>
+            </th>
+            {onDecision && <th className="p-4 w-28">Action</th>}
+            <th className="p-4">Product Info</th>
+            <th className="p-4">SKC / Image</th>
+            <th className="p-4">Details</th>
+            <th className="p-4">Stores / Grades</th>
+            <th className="p-4">Dev Status</th>
+            <th className="p-4">Selection</th>
           </tr>
         </thead>
-        <tbody className="text-xs text-gray-600 divide-y divide-gray-100">
+        <tbody className="text-xs text-slate-600 divide-y divide-slate-100 bg-white">
           {products.map((product) => (
-            <tr key={product.id} className="hover:bg-blue-50 transition-colors">
-              <td className="p-3 text-center align-top">
-                <input type="checkbox" className="mt-1" />
+            <tr key={product.id} className="hover:bg-slate-50/80 transition-colors group">
+              <td className="p-4 text-center align-top">
+                <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-3.5 w-3.5 cursor-pointer mt-1" />
               </td>
               {onDecision && (
-                <td className="p-3 align-top">
+                <td className="p-4 align-top">
                   <button 
                     onClick={() => onDecision(product)}
-                    className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                    className="flex items-center gap-1 text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md font-medium transition-colors text-[11px] opacity-80 hover:opacity-100 whitespace-nowrap"
                   >
-                    选品决策
+                    选品决策 <ArrowRight size={10} />
                   </button>
                 </td>
               )}
-              <td className="p-3 align-top">
-                <div className="flex flex-col space-y-1">
-                  <div className="flex space-x-1">
-                    <span className="text-gray-400">选品ID:</span>
-                    <span className="text-blue-600 hover:underline cursor-pointer">{product.id}</span>
+              <td className="p-4 align-top">
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-2">
+                     <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono text-[10px]">{product.id}</span>
+                     <span className="font-semibold text-slate-800">{product.drop}</span>
                   </div>
-                  <div className="flex space-x-1">
-                    <span className="text-gray-400">SPU:</span>
-                    <span className="text-blue-600 hover:underline cursor-pointer truncate max-w-[120px]" title={product.spu}>{product.spu}</span>
+                  <div className="font-mono text-slate-500 text-[10px] copy-all select-all" title={product.spu}>
+                    SPU: {product.spu}
                   </div>
-                  <div className="flex space-x-1">
-                    <span className="text-gray-400">SKC:</span>
-                    <span className="text-blue-600 hover:underline cursor-pointer truncate max-w-[120px]" title={product.skc}>{product.skc}</span>
+                   <div className="font-mono text-blue-600 font-medium text-[11px] cursor-pointer hover:underline truncate max-w-[140px]" title={product.skc}>
+                    {product.skc}
                   </div>
-                  <div className="flex space-x-1">
-                    <span className="text-gray-400">DROP:</span>
-                    <span className="text-blue-600 hover:underline cursor-pointer">{product.drop}</span>
-                  </div>
-                  <div className="text-gray-500 mt-1">计划上新日期: <span className="text-gray-800">{product.planDate}</span></div>
+                   <div className="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+                     <Clock size={10} /> 
+                     Plan: <span className="text-slate-600">{product.planDate}</span>
+                   </div>
                 </div>
               </td>
-              <td className="p-3 align-top">
-                <img 
-                    src={product.imageUrl} 
-                    alt="SKC" 
-                    className="w-16 h-16 object-cover rounded border border-gray-200" 
-                 />
+              <td className="p-4 align-top">
+                <div className="relative w-20 h-24 rounded-lg overflow-hidden border border-slate-100 shadow-sm group-hover:shadow-md transition-all group-hover:scale-105 origin-left duration-300">
+                    <ProductHoverPreview product={product}>
+                        <img 
+                            src={product.imageUrl} 
+                            alt="SKC" 
+                            className="w-full h-full object-cover" 
+                        />
+                    </ProductHoverPreview>
+                </div>
               </td>
-              <td className="p-3 align-top">
+              <td className="p-4 align-top">
                 <div className="space-y-2">
-                  <div className="text-gray-800 font-medium">{product.categoryPath}</div>
-                  <div>
-                    <span className="text-gray-400 mr-1">预估售价:</span>
-                    <span className="font-bold text-gray-900">${product.price.toFixed(1)}</span>
+                  <div className="text-slate-800 font-medium truncate max-w-[180px] text-[11px] px-2 py-0.5 bg-slate-50 rounded inline-block">
+                    {product.categoryPath.split('>>').pop()}
                   </div>
-                   <div>
-                    <span className="text-gray-400 mr-1">产品线:</span>
-                    <span className="text-gray-800 bg-gray-100 px-1 rounded">{product.productLine}</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex justify-between items-center w-32">
+                        <span className="text-slate-400 text-[10px]">Price</span>
+                        <span className="font-bold text-slate-900">${product.price.toFixed(1)}</span>
+                    </div>
+                     <div className="flex justify-between items-center w-32">
+                        <span className="text-slate-400 text-[10px]">Line</span>
+                        <span className="text-slate-700">{product.productLine}</span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-gray-400 mr-1">企划开发员:</span>
-                    <span className="text-purple-600 font-medium">{product.planningDeveloper}</span>
+                  <div className="flex items-center gap-1.5 mt-2">
+                     <div className="w-5 h-5 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-[10px] font-bold">
+                        {product.planningDeveloper.charAt(0)}
+                     </div>
+                     <span className="text-slate-600 text-[11px]">{product.planningDeveloper}</span>
                   </div>
                 </div>
               </td>
-              <td className="p-3 align-top">
+              <td className="p-4 align-top">
                 {product.selectionStatus === 'Pending' ? (
-                  <span className="text-gray-400 italic">待评级</span>
+                  <span className="text-slate-400 text-[11px] italic flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span> 待评级
+                  </span>
                 ) : (
                   <div className="space-y-2">
                     {product.stores.map((store, idx) => (
-                      <div key={idx} className="flex items-center">
+                      <div key={idx} className="flex items-center gap-2">
                         <GradeBadge grade={store.grade} />
-                        <div className="flex flex-col">
-                          <span className="text-gray-800">{store.storeName}</span>
+                        <div className="flex flex-col leading-none">
+                          <span className="text-slate-700 font-medium text-[11px]">{store.storeName}</span>
                           {store.inventoryDepth && (
-                            <span className="text-[10px] text-gray-400">库存深度: {store.inventoryDepth}</span>
+                            <span className="text-[9px] text-slate-400 mt-0.5">Depth: {store.inventoryDepth}</span>
                           )}
                         </div>
                       </div>
@@ -120,72 +294,60 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDecision }) => 
                   </div>
                 )}
               </td>
-              <td className="p-3 align-top">
-                <div className="space-y-1">
-                  <div>
-                    <span className="text-gray-400 mr-1">开发单号:</span>
-                    <span className="text-blue-600">{product.devUnitId}</span>
+              <td className="p-4 align-top">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${
+                        product.devStatus === '已完成' ? 'bg-green-400' : 
+                        product.devStatus === '已过款' ? 'bg-blue-400' : 'bg-slate-300'
+                    }`}></span>
+                    <span className="text-slate-700 font-medium">{product.devStatus}</span>
                   </div>
-                  <div>
-                    <span className="text-gray-400 mr-1">开发状态:</span>
-                    <span>{product.devStatus}</span>
+                  <div className="text-[10px] text-slate-400 pl-4">
+                     ID: {product.devUnitId}
                   </div>
-                  <div>
-                    <span className="text-gray-400 mr-1">开款渠道:</span>
-                    <span className="font-medium">{product.channel}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400 mr-1">设计师:</span>
-                    <span>{product.designer}</span>
-                  </div>
-                </div>
-              </td>
-              <td className="p-3 align-top">
-                <div className="flex flex-col gap-1">
-                  {product.tags.map((tag, i) => (
-                    <span 
-                      key={i} 
-                      className={`px-2 py-0.5 rounded text-[10px] inline-block w-fit
-                        ${tag.includes('选品') ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-white text-gray-500 border border-gray-200'}
-                      `}
-                    >
-                      {tag}
+                  <div className="pl-4">
+                    <span className="inline-block px-1.5 py-0.5 rounded border border-slate-200 text-slate-500 text-[10px]">
+                        {product.channel}
                     </span>
-                  ))}
-                </div>
-              </td>
-              <td className="p-3 align-top">
-                 <span className={`inline-block px-2 py-0.5 rounded text-[10px] border
-                    ${product.selectionStatus === 'Selected' ? 'bg-green-100 text-green-700 border-green-200' : 
-                      product.selectionStatus === 'Rejected' ? 'bg-red-100 text-red-700 border-red-200' :
-                      'bg-yellow-100 text-yellow-700 border-yellow-200'
-                    }
-                 `}>
-                    {product.selectionStatus === 'Selected' ? '已选品' : 
-                     product.selectionStatus === 'Rejected' ? '已取消' : '待选品'}
-                 </span>
-              </td>
-              <td className="p-3 align-top">
-                <span className="text-gray-800">{product.operator}</span>
-              </td>
-              <td className="p-3 align-top">
-                <div className="text-gray-400 space-y-1">
-                  <div>
-                    <div className="scale-90 origin-top-left">创建时间:</div>
-                    <div className="text-gray-600">{product.createdTime}</div>
-                  </div>
-                  <div>
-                    <div className="scale-90 origin-top-left">选品时间:</div>
-                    <div className="text-gray-600">{product.selectionTime}</div>
                   </div>
                 </div>
+              </td>
+              <td className="p-4 align-top">
+                 <div className="flex flex-col items-start gap-2">
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border shadow-sm
+                        ${product.selectionStatus === 'Selected' ? 'bg-green-50 text-green-700 border-green-200' : 
+                        product.selectionStatus === 'Rejected' ? 'bg-red-50 text-red-700 border-red-200' :
+                        'bg-yellow-50 text-yellow-700 border-yellow-200'
+                        }
+                    `}>
+                        {product.selectionStatus === 'Selected' ? 'SELECTED' : 
+                        product.selectionStatus === 'Rejected' ? 'CANCELLED' : 'PENDING'}
+                    </span>
+                    
+                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                        <User size={10} className="text-slate-400" />
+                        {product.operator}
+                    </div>
+                    <div className="flex flex-col text-[10px] text-slate-400 gap-0.5">
+                         <span>C: {product.createdTime.split(' ')[0]}</span>
+                         {product.selectionTime && product.selectionTime !== '-' && (
+                            <span className="text-slate-500">S: {product.selectionTime.split(' ')[0]}</span>
+                         )}
+                    </div>
+                 </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
       {products.length === 0 && (
-        <div className="p-8 text-center text-gray-500">暂无数据</div>
+        <div className="p-12 text-center flex flex-col items-center text-slate-400">
+            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3">
+                <span className="text-2xl">🔍</span>
+            </div>
+            <p>暂无符合条件的数据</p>
+        </div>
       )}
     </div>
   );

@@ -1,176 +1,178 @@
-import React from 'react';
-import { Search, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, ChevronDown, Calendar, Filter, Check } from 'lucide-react';
 
 interface FilterBarProps {
   onSearch: () => void;
   onReset: () => void;
 }
 
-const FilterBar: React.FC<FilterBarProps> = ({ onSearch, onReset }) => {
+const STORE_OPTIONS = ['Farmer Market-FM', 'Valley Fair-VF'];
+
+const MultiSelect: React.FC<{ 
+  label: string; 
+  options: string[]; 
+  value: string[]; 
+  onChange: (val: string[]) => void; 
+}> = ({ label, options, value, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleOption = (option: string) => {
+    if (value.includes(option)) {
+      onChange(value.filter(v => v !== option));
+    } else {
+      onChange([...value, option]);
+    }
+  };
+
   return (
-    <div className="bg-white p-4 rounded shadow-sm mb-4 border border-gray-100">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end">
-        {/* Row 1 - Item 1 */}
-        <div className="flex space-x-2">
-          <div className="flex-none w-24">
-            <label className="block text-xs font-medium text-gray-500 mb-1">搜索</label>
-            <div className="relative">
-                <select className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:outline-none focus:border-blue-500 appearance-none bg-white">
-                <option>SPU</option>
-                <option>SKC</option>
-                <option>选品ID</option>
-                <option>开发单号</option>
-                <option>Drop</option>
-                </select>
-                <ChevronDown className="w-3 h-3 text-gray-400 absolute right-2 top-2.5 pointer-events-none" />
-            </div>
-          </div>
-          <div className="flex-grow">
-            <label className="block text-xs font-medium text-gray-500 mb-1 opacity-0">Input</label>
-            <div className="relative">
-                 <input 
-                type="text" 
-                placeholder="请输入搜索" 
-                className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:outline-none focus:border-blue-500 pl-8"
-                />
-                <Search className="w-3 h-3 text-gray-400 absolute left-2.5 top-2.5 pointer-events-none" />
-            </div>
-          </div>
-        </div>
+    <div className="relative group" ref={ref}>
+       <label className="absolute -top-2 left-2 px-1 bg-white text-[10px] font-medium text-slate-400 z-10">
+         {label}
+       </label>
+       <button 
+         onClick={() => setIsOpen(!isOpen)}
+         className="w-full h-10 flex items-center justify-between text-xs text-slate-600 bg-white border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all hover:border-slate-300"
+         type="button"
+       >
+         <span className="truncate block text-left">
+           {value.length === 0 ? '全部门店' : value.join(', ')}
+         </span>
+         <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+       </button>
+       
+       {isOpen && (
+         <div className="absolute top-full left-0 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 py-1 max-h-48 overflow-y-auto">
+           {options.map(opt => (
+             <div 
+               key={opt}
+               onClick={() => toggleOption(opt)}
+               className="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 cursor-pointer"
+             >
+               <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${value.includes(opt) ? 'bg-blue-600 border-blue-600' : 'border-slate-300 bg-white'}`}>
+                 {value.includes(opt) && <Check size={10} className="text-white" />}
+               </div>
+               <span className="text-xs text-slate-700">{opt}</span>
+             </div>
+           ))}
+         </div>
+       )}
+    </div>
+  );
+};
 
-        {/* Item 2 */}
-        <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">产品分类</label>
-          <div className="relative">
-            <select className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:outline-none focus:border-blue-500 text-gray-500 appearance-none bg-white">
-                <option>请选择产品分类</option>
-                <option>上衣</option>
-                <option>下装</option>
-                <option>连衣裙</option>
-                <option>裤装</option>
-            </select>
-            <ChevronDown className="w-3 h-3 text-gray-400 absolute right-2 top-2.5 pointer-events-none" />
-          </div>
-        </div>
+const FilterBar: React.FC<FilterBarProps> = ({ onSearch, onReset }) => {
+  const [selectedStores, setSelectedStores] = useState<string[]>([]);
 
-        {/* Item 3 */}
-        <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">选品状态</label>
-           <div className="relative">
-            <select className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:outline-none focus:border-blue-500 text-gray-500 appearance-none bg-white">
-                <option value="">全部</option>
-                <option value="Pending">待选品</option>
-                <option value="Selected">已选品</option>
-                <option value="Rejected">已取消</option>
-            </select>
-            <ChevronDown className="w-3 h-3 text-gray-400 absolute right-2 top-2.5 pointer-events-none" />
-          </div>
-        </div>
+  const handleReset = () => {
+      setSelectedStores([]);
+      onReset();
+  };
 
-        {/* Item 4 */}
-        <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">开发单状态</label>
-           <div className="relative">
-            <select className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:outline-none focus:border-blue-500 text-gray-500 appearance-none bg-white">
-                <option value="">全部</option>
-                <option value="已过款">已过款</option>
-                <option value="已审版">已审版</option>
-                <option value="已纸样编辑">已纸样编辑</option>
-                <option value="已工艺编辑">已工艺编辑</option>
-                <option value="已核价">已核价</option>
-                <option value="已议价">已议价</option>
-                <option value="已完成">已完成</option>
-            </select>
-            <ChevronDown className="w-3 h-3 text-gray-400 absolute right-2 top-2.5 pointer-events-none" />
+  return (
+    <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/60">
+      <div className="flex items-center gap-2 mb-4 text-slate-800">
+          <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+             <Filter size={16} />
           </div>
-        </div>
+          <span className="text-sm font-bold">筛选条件</span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-4">
         
-        {/* Row 2 starts on LG if 4 cols. Starts on line 1 pos 5 on XL if 5 cols. */}
-        {/* Item 5 */}
-        <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">产品线</label>
-          <div className="relative">
-            <select className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:outline-none focus:border-blue-500 text-gray-600 appearance-none bg-white">
-                <option value="">全部</option>
-                <option value="常规码">常规码</option>
-                <option value="大码">大码</option>
-            </select>
-            <ChevronDown className="w-3 h-3 text-gray-400 absolute right-2 top-2.5 pointer-events-none" />
-          </div>
+        {/* Search Group */}
+        <div className="col-span-1 md:col-span-2 lg:col-span-2 flex gap-2">
+            <div className="w-1/3 relative group">
+                <select className="w-full h-10 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all appearance-none cursor-pointer hover:border-slate-300">
+                    <option>SPU</option>
+                    <option>SKC</option>
+                    <option>选品ID</option>
+                    <option>开发单号</option>
+                    <option>Drop</option>
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-3.5 pointer-events-none group-hover:text-slate-600 transition-colors" />
+            </div>
+            <div className="w-2/3 relative group">
+                <input 
+                    type="text" 
+                    placeholder="请输入关键词搜索..." 
+                    className="w-full h-10 text-xs bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all hover:border-slate-300 placeholder:text-slate-400"
+                />
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none group-hover:text-blue-500 transition-colors" />
+            </div>
         </div>
 
-        {/* Item 6 */}
-        <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">企划开发员</label>
-           <div className="relative">
-            <select className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:outline-none focus:border-blue-500 text-gray-600 appearance-none bg-white">
-                <option value="">全部</option>
-                <option value="沈可忻">沈可忻</option>
-                <option value="Lindsay Fiegleman">Lindsay Fiegleman</option>
-                <option value="Eva 卜依文">Eva 卜依文</option>
-                <option value="谈嘉轩momo">谈嘉轩momo</option>
-                <option value="Esther Blum">Esther Blum</option>
-            </select>
-            <ChevronDown className="w-3 h-3 text-gray-400 absolute right-2 top-2.5 pointer-events-none" />
-          </div>
-        </div>
+        {/* Existing Filters */}
+        {[
+            { label: '产品分类', placeholder: '全部分类' },
+            { label: '选品状态', placeholder: '全部状态' },
+            { label: '开发单状态', placeholder: '全部状态' },
+            { label: '产品线', placeholder: '全部产品线' },
+            { label: '企划开发员', placeholder: '全部人员' },
+            { label: '开款渠道', placeholder: '全部渠道' }
+        ].map((filter, index) => (
+             <div key={index} className="relative group">
+                <label className="absolute -top-2 left-2 px-1 bg-white text-[10px] font-medium text-slate-400 group-focus-within:text-blue-500 transition-colors z-10">
+                    {filter.label}
+                </label>
+                <select className="w-full h-10 text-xs text-slate-600 bg-white border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all appearance-none cursor-pointer hover:border-slate-300">
+                    <option>{filter.placeholder}</option>
+                    {/* Options would go here */}
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-3.5 pointer-events-none group-hover:text-slate-600 transition-colors" />
+            </div>
+        ))}
 
-        {/* New Item 7: 开款渠道 */}
-        <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">开款渠道</label>
-          <div className="relative">
-             <select className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:outline-none focus:border-blue-500 text-gray-400 appearance-none bg-white">
-               <option value="">全部</option>
-                <option value="FOB">FOB</option>
-               <option value="OEM">OEM</option>
-               <option value="ODM">ODM供款</option>
-               
-             </select>
-             <ChevronDown className="w-3 h-3 text-gray-400 absolute right-2 top-2.5 pointer-events-none" />
-          </div>
-        </div>
+        {/* New Multi-select Store Filter */}
+        <MultiSelect 
+            label="线下门店" 
+            options={STORE_OPTIONS} 
+            value={selectedStores} 
+            onChange={setSelectedStores} 
+        />
 
-        {/* New Item 8: 时间 - spans 2 cols */}
-        <div className="md:col-span-2 xl:col-span-2">
-           <label className="block text-xs font-medium text-gray-500 mb-1">时间</label>
-           <div className="flex space-x-2">
-             <div className="relative w-28 flex-shrink-0">
-                <select className="w-full h-8 text-xs border border-gray-300 rounded px-2 focus:outline-none focus:border-blue-500 text-gray-600 appearance-none bg-white">
+        {/* Date Range - Spanning */}
+        <div className="md:col-span-2 xl:col-span-1 flex gap-2 items-center">
+           <div className="w-28 relative group shrink-0">
+                <label className="absolute -top-2 left-2 px-1 bg-white text-[10px] font-medium text-slate-400 z-10">时间类型</label>
+                <select className="w-full h-10 text-xs text-slate-600 bg-white border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all appearance-none cursor-pointer hover:border-slate-300">
                   <option value="created">创建时间</option>
                   <option value="selection">选品时间</option>
                 </select>
-                <ChevronDown className="w-3 h-3 text-gray-400 absolute right-2 top-2.5 pointer-events-none" />
-             </div>
-             <div className="flex items-center space-x-2 flex-1">
-                <div className="relative flex-1">
-                    <input type="text" onFocus={(e) => e.currentTarget.type = 'date'} onBlur={(e) => e.currentTarget.type = 'text'} className="w-full h-8 text-xs border border-gray-300 rounded px-2 pl-7 focus:outline-none focus:border-blue-500 text-gray-400" placeholder="开始日期" />
-                    <Calendar className="w-3 h-3 text-gray-400 absolute left-2 top-2.5 pointer-events-none" />
-                </div>
-                <span className="text-gray-400">~</span>
-                <div className="relative flex-1">
-                    <input type="text" onFocus={(e) => e.currentTarget.type = 'date'} onBlur={(e) => e.currentTarget.type = 'text'} className="w-full h-8 text-xs border border-gray-300 rounded px-2 pl-7 focus:outline-none focus:border-blue-500 text-gray-400" placeholder="结束日期" />
-                    <Calendar className="w-3 h-3 text-gray-400 absolute left-2 top-2.5 pointer-events-none" />
-                </div>
-             </div>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-3.5 pointer-events-none" />
+           </div>
+           
+           <div className="flex-1 flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-1 px-2 h-10 hover:border-slate-300 transition-colors group focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-400">
+                <Calendar className="w-4 h-4 text-slate-400" />
+                <input type="text" className="w-full bg-transparent text-xs border-none focus:ring-0 p-0 text-slate-600 placeholder:text-slate-400" placeholder="开始" onFocus={(e) => e.currentTarget.type = 'date'} onBlur={(e) => e.currentTarget.type = 'text'} />
+                <span className="text-slate-300">-</span>
+                <input type="text" className="w-full bg-transparent text-xs border-none focus:ring-0 p-0 text-slate-600 placeholder:text-slate-400 text-right" placeholder="结束" onFocus={(e) => e.currentTarget.type = 'date'} onBlur={(e) => e.currentTarget.type = 'text'} />
            </div>
         </div>
 
-        {/* Buttons - Align Right */}
-        <div className="md:col-span-2 lg:col-span-4 xl:col-span-1 xl:col-start-5 flex justify-end items-center space-x-2 pt-2 xl:pt-0">
+        {/* Action Buttons */}
+        <div className="md:col-span-2 lg:col-span-4 xl:col-span-1 xl:col-start-5 flex justify-end items-center gap-2">
           <button 
-            onClick={onSearch}
-            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-6 py-2 rounded transition-colors whitespace-nowrap"
-          >
-            搜索
-          </button>
-          <button 
-            onClick={onReset}
-            className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs px-6 py-2 rounded transition-colors whitespace-nowrap"
+            onClick={handleReset}
+            className="h-10 px-5 rounded-lg border border-slate-200 text-slate-600 text-xs font-medium hover:bg-slate-50 hover:text-slate-800 transition-all"
           >
             重置
           </button>
-          <button className="text-blue-500 text-xs flex items-center hover:underline ml-2 whitespace-nowrap">
-            收起 <ChevronUp className="w-3 h-3 ml-1" />
+          <button 
+            onClick={onSearch}
+            className="h-10 px-8 rounded-lg bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 hover:shadow-md transition-all active:transform active:scale-95"
+          >
+            查询结果
           </button>
         </div>
       </div>
