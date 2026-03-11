@@ -427,10 +427,9 @@ const ProductCard: React.FC<{
             
             <div className={`mt-auto pt-2 flex items-center justify-between border-t border-slate-50`}>
                 <div className="flex gap-1 flex-wrap h-5 overflow-hidden">
-                    {/* Updated to show up to 2 tags */}
-                    {product.tags.slice(0, 2).map((t, i) => (
-                        <span key={i} className="bg-slate-50 text-slate-500 border border-slate-100 px-1.5 py-0.5 rounded text-[9px] truncate max-w-full font-medium">{t}</span>
-                    ))}
+                    <span className="bg-slate-50 text-slate-500 border border-slate-100 px-1.5 py-0.5 rounded text-[9px] truncate max-w-full font-medium">
+                        {product.styleLine || product.tags[0] || 'Cute'}
+                    </span>
                 </div>
                 <span className="text-[10px] text-slate-400 font-medium">{product.drop}</span>
             </div>
@@ -718,50 +717,11 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
                     </button>
                  </div>
              </div>
-             
-             {/* Filter Section */}
-             <div className="px-5 py-3 border-t border-slate-100 bg-slate-50/50 flex items-center gap-3">
-                 <div className="flex items-center gap-2 text-xs text-slate-500 mr-2">
-                     <Filter size={14} /> 筛选:
-                 </div>
-                 
-                 <div className="relative group min-w-[120px]">
-                     <select 
-                        value={activeFilters.productLine}
-                        onChange={(e) => setActiveFilters(prev => ({ ...prev, productLine: e.target.value }))}
-                        className="w-full h-8 text-xs text-slate-600 bg-white border border-slate-200 rounded px-2 focus:outline-none focus:ring-1 focus:ring-blue-400 cursor-pointer hover:border-slate-300"
-                     >
-                         <option value="">全部产品线</option>
-                         {productLines.map(line => <option key={line} value={line}>{line}</option>)}
-                     </select>
-                 </div>
-
-                 <div className="relative group min-w-[120px]">
-                     <select 
-                        value={activeFilters.planningDeveloper}
-                        onChange={(e) => setActiveFilters(prev => ({ ...prev, planningDeveloper: e.target.value }))}
-                        className="w-full h-8 text-xs text-slate-600 bg-white border border-slate-200 rounded px-2 focus:outline-none focus:ring-1 focus:ring-blue-400 cursor-pointer hover:border-slate-300"
-                     >
-                         <option value="">全部企划开发员</option>
-                         {planners.map(planner => <option key={planner} value={planner}>{planner}</option>)}
-                     </select>
-                 </div>
-
-                 {/* Reset Filter Button */}
-                 {(activeFilters.productLine || activeFilters.planningDeveloper) && (
-                     <button 
-                        onClick={() => setActiveFilters(prev => ({ ...prev, productLine: '', planningDeveloper: '' }))}
-                        className="text-[10px] text-blue-600 hover:underline px-2"
-                     >
-                         清除筛选
-                     </button>
-                 )}
-             </div>
          </div>
 
          {/* Content */}
          <div className="flex-1 overflow-y-auto p-5 bg-slate-50/30 scroll-smooth">
-             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pb-20">
+             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 pb-20">
                 {currentProducts.map(product => (
                     <ProductCard 
                         key={product.id} 
@@ -780,7 +740,7 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
                         // Dynamic Icon: Plus for Pool, Edit for others
                         actionIcon={viewMode === 'pool' ? <Plus size={18} /> : <Edit size={14} />}
                         actionClass={viewMode === 'pool' ? "bg-slate-900 text-white hover:bg-blue-600" : "bg-white text-slate-500 border border-slate-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"}
-                        showDetails={viewMode !== 'pool'}
+                        showDetails={viewMode === 'cancelled'}
                     />
                 ))}
                 {displayedProducts.length === 0 && (
@@ -876,8 +836,23 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
                            <img src={product.imageUrl} alt={product.skc} className="w-full h-full object-cover pointer-events-none" />
                            
                            {/* Subtle Price Tag */}
-                           <div className="absolute bottom-1 right-1 bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-white font-medium z-20">
+                           <div className="absolute top-1 left-1 bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] text-white font-medium z-20">
                                ${product.price}
+                           </div>
+
+                           {/* SKC and Category Path Overlay */}
+                           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 pt-6 z-20">
+                               <div className="text-white text-[10px] font-bold truncate" title={product.skc}>
+                                   {product.skc}
+                               </div>
+                               <div className="flex items-center gap-1 mt-0.5">
+                                   <div className="text-white/80 text-[8px] truncate flex-1" title={product.categoryPath}>
+                                       {product.categoryPath}
+                                   </div>
+                                   <div className="text-white/90 text-[8px] font-medium bg-white/20 px-1 rounded">
+                                       {product.styleLine || product.tags[0] || 'Cute'}
+                                   </div>
+                               </div>
                            </div>
 
                            {/* Delete Button (Always Visible) */}
@@ -1014,7 +989,7 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
                   <div className="flex-1 overflow-y-auto p-10 bg-slate-50/50">
                       <div className="max-w-7xl mx-auto">
                           {selectedList.length > 0 ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
                                 {selectedList.map((product, index) => {
                                     const isSelected = selectedProductIds.has(product.id);
                                     // Extract the leaf category from the path or default to first part
@@ -1064,31 +1039,20 @@ const MoodSelection: React.FC<MoodSelectionProps> = ({ products }) => {
                                                     <Trash2 size={14} />
                                                 </button>
                                             </div>
-
-                                            <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur text-white text-[10px] px-1.5 py-0.5 rounded">
-                                                {product.skc}
-                                            </div>
                                         </div>
 
-                                        {/* Individual Category Area */}
-                                        <div className="p-3 bg-white flex-1 flex flex-col gap-2 border-t border-slate-100" onClick={(e) => e.stopPropagation()}>
-                                            <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                                                <Tag size={10} /> 产品分类
+                                        {/* Product Info Area */}
+                                        <div className="p-3 bg-white flex-1 flex flex-col gap-1 border-t border-slate-100" onClick={(e) => e.stopPropagation()}>
+                                            <div className="text-slate-800 text-xs font-bold truncate" title={product.skc}>
+                                                {product.skc}
                                             </div>
-                                            <div className="flex items-center justify-between text-xs">
-                                                 <select 
-                                                    value={matchedCategory || currentCategory}
-                                                    onChange={(e) => handleIndividualCategoryChange(product.id, e.target.value)}
-                                                    className="w-full border border-slate-200 rounded px-2 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
-                                                 >
-                                                    {CATEGORIES.map(c => (
-                                                        <option key={c} value={c}>{c}</option>
-                                                    ))}
-                                                    {/* Fallback option if current category is not in list */}
-                                                    {!CATEGORIES.includes(currentCategory) && currentCategory && (
-                                                        <option value={currentCategory}>{currentCategory}</option>
-                                                    )}
-                                                 </select>
+                                            <div className="flex items-center justify-between gap-2">
+                                                <div className="text-slate-500 text-[10px] truncate flex-1" title={product.categoryPath}>
+                                                    {product.categoryPath}
+                                                </div>
+                                                <div className="text-slate-600 text-[9px] font-medium bg-slate-100 px-1.5 py-0.5 rounded">
+                                                    {product.styleLine || product.tags[0] || 'Cute'}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

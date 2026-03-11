@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, ChevronDown, Calendar, Filter, Check } from 'lucide-react';
-import { PRODUCT_LINES, PLANNING_DEVELOPERS } from '../constants';
 
 interface FilterBarProps {
   onSearch: () => void;
@@ -89,33 +88,66 @@ const FilterBar: React.FC<FilterBarProps> = ({ onSearch, onReset }) => {
           <span className="text-sm font-bold">筛选条件</span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-x-4 gap-y-4">
         
-        {/* Search Group */}
-        <div className="col-span-1 md:col-span-2 lg:col-span-2 flex gap-2">
-            <div className="w-1/3 relative group">
-                <select className="w-full h-10 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all appearance-none cursor-pointer hover:border-slate-300">
-                    <option>SPU</option>
-                    <option>SKC</option>
-                    <option>选品ID</option>
-                    <option>开发单号</option>
-                    <option>Drop</option>
-                </select>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-3.5 pointer-events-none group-hover:text-slate-600 transition-colors" />
-            </div>
-            <div className="w-2/3 relative group">
-                <input 
-                    type="text" 
-                    placeholder="请输入关键词搜索..." 
-                    className="w-full h-10 text-xs bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all hover:border-slate-300 placeholder:text-slate-400"
-                />
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none group-hover:text-blue-500 transition-colors" />
-            </div>
+        {/* Search Inputs */}
+        <div className="relative group">
+            <label className="absolute -top-2 left-2 px-1 bg-white text-[10px] font-medium text-slate-400 group-focus-within:text-blue-500 transition-colors z-10">
+                SPU
+            </label>
+            <input 
+                type="text" 
+                placeholder="请输入SPU" 
+                className="w-full h-10 text-xs bg-white border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all hover:border-slate-300 placeholder:text-slate-400"
+            />
+        </div>
+        <div className="relative group">
+            <label className="absolute -top-2 left-2 px-1 bg-white text-[10px] font-medium text-slate-400 group-focus-within:text-blue-500 transition-colors z-10">
+                SKC
+            </label>
+            <input 
+                type="text" 
+                placeholder="请输入SKC" 
+                className="w-full h-10 text-xs bg-white border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all hover:border-slate-300 placeholder:text-slate-400"
+            />
+        </div>
+        <div className="relative group">
+            <label className="absolute -top-2 left-2 px-1 bg-white text-[10px] font-medium text-slate-400 group-focus-within:text-blue-500 transition-colors z-10">
+                选品ID
+            </label>
+            <input 
+                type="text" 
+                placeholder="请输入选品ID" 
+                className="w-full h-10 text-xs bg-white border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all hover:border-slate-300 placeholder:text-slate-400"
+            />
+        </div>
+        <div className="relative group">
+            <label className="absolute -top-2 left-2 px-1 bg-white text-[10px] font-medium text-slate-400 group-focus-within:text-blue-500 transition-colors z-10">
+                开发单号
+            </label>
+            <input 
+                type="text" 
+                placeholder="请输入开发单号" 
+                className="w-full h-10 text-xs bg-white border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all hover:border-slate-300 placeholder:text-slate-400"
+            />
+        </div>
+        <div className="relative group">
+            <label className="absolute -top-2 left-2 px-1 bg-white text-[10px] font-medium text-slate-400 group-focus-within:text-blue-500 transition-colors z-10">
+                Drop
+            </label>
+            <input 
+                type="text" 
+                placeholder="请输入Drop" 
+                className="w-full h-10 text-xs bg-white border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all hover:border-slate-300 placeholder:text-slate-400"
+            />
         </div>
 
         {/* Existing Filters */}
         {[
             { label: '产品分类', placeholder: '全部分类' },
+            { label: '风格线', placeholder: '全部风格线' },
+            { label: '产品线', placeholder: '全部产品线' },
+            { label: '企划开发员', placeholder: '全部开发员' },
             { label: '选品状态', placeholder: '全部状态' },
             { label: '开发单状态', placeholder: '全部状态' },
             { label: '开款渠道', placeholder: '全部渠道' }
@@ -132,34 +164,6 @@ const FilterBar: React.FC<FilterBarProps> = ({ onSearch, onReset }) => {
             </div>
         ))}
 
-        {/* Product Line Filter */}
-        <div className="relative group">
-            <label className="absolute -top-2 left-2 px-1 bg-white text-[10px] font-medium text-slate-400 group-focus-within:text-blue-500 transition-colors z-10">
-                产品线
-            </label>
-            <select className="w-full h-10 text-xs text-slate-600 bg-white border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all appearance-none cursor-pointer hover:border-slate-300">
-                <option value="">全部产品线</option>
-                {PRODUCT_LINES.map(line => (
-                  <option key={line} value={line}>{line}</option>
-                ))}
-            </select>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-3.5 pointer-events-none group-hover:text-slate-600 transition-colors" />
-        </div>
-
-        {/* Planner Filter */}
-        <div className="relative group">
-            <label className="absolute -top-2 left-2 px-1 bg-white text-[10px] font-medium text-slate-400 group-focus-within:text-blue-500 transition-colors z-10">
-                企划开发员
-            </label>
-            <select className="w-full h-10 text-xs text-slate-600 bg-white border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all appearance-none cursor-pointer hover:border-slate-300">
-                <option value="">全部人员</option>
-                {PLANNING_DEVELOPERS.map(planner => (
-                  <option key={planner} value={planner}>{planner}</option>
-                ))}
-            </select>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-3.5 pointer-events-none group-hover:text-slate-600 transition-colors" />
-        </div>
-
         {/* New Multi-select Store Filter */}
         <MultiSelect 
             label="线下门店" 
@@ -169,17 +173,17 @@ const FilterBar: React.FC<FilterBarProps> = ({ onSearch, onReset }) => {
         />
 
         {/* Date Range - Spanning */}
-        <div className="md:col-span-2 xl:col-span-1 flex gap-2 items-center">
-           <div className="w-28 relative group shrink-0">
+        <div className="col-span-1 md:col-span-2 lg:col-span-2 xl:col-span-2 flex gap-2 items-center">
+           <div className="w-24 relative group shrink-0">
                 <label className="absolute -top-2 left-2 px-1 bg-white text-[10px] font-medium text-slate-400 z-10">时间类型</label>
-                <select className="w-full h-10 text-xs text-slate-600 bg-white border border-slate-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all appearance-none cursor-pointer hover:border-slate-300">
+                <select className="w-full h-10 text-xs text-slate-600 bg-white border border-slate-200 rounded-lg px-2 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all appearance-none cursor-pointer hover:border-slate-300">
                   <option value="created">创建时间</option>
                   <option value="selection">选品时间</option>
                 </select>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-3.5 pointer-events-none" />
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2 top-3.5 pointer-events-none" />
            </div>
            
-           <div className="flex-1 flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-1 px-2 h-10 hover:border-slate-300 transition-colors group focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-400">
+           <div className="flex-1 flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-1 px-2 h-10 hover:border-slate-300 transition-colors group focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-400">
                 <Calendar className="w-4 h-4 text-slate-400" />
                 <input type="text" className="w-full bg-transparent text-xs border-none focus:ring-0 p-0 text-slate-600 placeholder:text-slate-400" placeholder="开始" onFocus={(e) => e.currentTarget.type = 'date'} onBlur={(e) => e.currentTarget.type = 'text'} />
                 <span className="text-slate-300">-</span>
@@ -188,7 +192,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ onSearch, onReset }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="md:col-span-2 lg:col-span-4 xl:col-span-1 xl:col-start-5 flex justify-end items-center gap-2">
+        <div className="col-span-1 md:col-span-3 lg:col-span-5 xl:col-span-7 flex justify-end items-center gap-2 mt-2">
           <button 
             onClick={handleReset}
             className="h-10 px-5 rounded-lg border border-slate-200 text-slate-600 text-xs font-medium hover:bg-slate-50 hover:text-slate-800 transition-all"

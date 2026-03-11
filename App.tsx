@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import FilterBar from './components/FilterBar';
 import ProductTable from './components/ProductTable';
 import MoodSelection from './components/MoodSelection';
+import ImageBoard from './components/ImageBoard';
 import SelectionDecisionModal from './components/SelectionDecisionModal';
 import { MOCK_PRODUCTS } from './constants';
-import { RefreshCw, Download, LayoutGrid, List, Layers } from 'lucide-react';
+import { RefreshCw, Download, LayoutGrid, List, Layers, ImageIcon } from 'lucide-react';
 import { Product } from './types';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('pending');
-  const [devType, setDevType] = useState<'single' | 'mood'>('single');
+  const [devType, setDevType] = useState<'single' | 'mood' | 'dashboard'>('single');
   
   // Selection Decision Modal State
   const [isDecisionModalOpen, setIsDecisionModalOpen] = useState(false);
@@ -73,6 +74,17 @@ const App: React.FC = () => {
                <LayoutGrid size={14} />
                Mood/Campaign选品
              </button>
+             <button 
+               onClick={() => setDevType('dashboard')} 
+               className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 ${
+                 devType === 'dashboard' 
+                 ? 'bg-white text-emerald-600 shadow-sm ring-1 ring-black/5' 
+                 : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+               }`}
+             >
+               <ImageIcon size={14} />
+               已选品看板
+             </button>
           </div>
         </div>
 
@@ -92,12 +104,14 @@ const App: React.FC = () => {
 
         <div className="flex-1 flex flex-col z-10 px-6 py-6 overflow-hidden">
             {/* Filter Section */}
-            <div className="flex-none mb-6">
-               <FilterBar 
-                  onSearch={() => console.log('Searching...')} 
-                  onReset={() => console.log('Resetting...')}
-                />
-            </div>
+            {devType !== 'dashboard' && (
+              <div className="flex-none mb-6">
+                 <FilterBar 
+                    onSearch={() => console.log('Searching...')} 
+                    onReset={() => console.log('Resetting...')}
+                  />
+              </div>
+            )}
 
             {/* Dynamic Content */}
             <div className="flex-1 min-h-0 relative">
@@ -160,9 +174,12 @@ const App: React.FC = () => {
                      </div>
                   </div>
                 </div>
-              ) : (
+              ) : devType === 'mood' ? (
                 /* Mood Selection View */
                 <MoodSelection products={MOCK_PRODUCTS} />
+              ) : (
+                /* Dashboard View */
+                <ImageBoard products={MOCK_PRODUCTS} />
               )}
             </div>
         </div>

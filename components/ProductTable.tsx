@@ -207,13 +207,16 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDecision }) => 
                     <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-3.5 w-3.5 cursor-pointer" />
                 </div>
             </th>
-            {onDecision && <th className="p-4 w-28">Action</th>}
-            <th className="p-4">Product Info</th>
-            <th className="p-4">SKC / Image</th>
-            <th className="p-4">Details</th>
-            <th className="p-4">Stores / Grades</th>
-            <th className="p-4">Dev Status</th>
-            <th className="p-4">Selection</th>
+            {onDecision && <th className="p-4 w-24">操作</th>}
+            <th className="p-4">基本信息</th>
+            <th className="p-4">SKC主图</th>
+            <th className="p-4">产品信息</th>
+            <th className="p-4">预估等级</th>
+            <th className="p-4">打版信息</th>
+            <th className="p-4">产品标签</th>
+            <th className="p-4">选品状态</th>
+            <th className="p-4">选品操作人</th>
+            <th className="p-4">时间</th>
           </tr>
         </thead>
         <tbody className="text-xs text-slate-600 divide-y divide-slate-100 bg-white">
@@ -226,42 +229,38 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDecision }) => 
                 <td className="p-4 align-top">
                   <button 
                     onClick={() => onDecision(product)}
-                    className="flex items-center gap-1 text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md font-medium transition-colors text-[11px] opacity-80 hover:opacity-100 whitespace-nowrap"
+                    className="text-blue-500 hover:text-blue-700 font-medium text-xs transition-colors whitespace-nowrap"
                   >
-                    选品决策 <ArrowRight size={10} />
+                    选品决策
                   </button>
                 </td>
               )}
               <td className="p-4 align-top">
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center gap-2">
-                     <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono text-[10px]">{product.id}</span>
-                     <span className="font-semibold text-slate-800">{product.drop}</span>
+                <div className="flex flex-col gap-1.5 text-xs text-slate-600">
+                  <div className="flex items-center gap-1">
+                     <span className="text-slate-400">选品ID:</span>
+                     <span className="text-blue-500 hover:underline cursor-pointer">{product.id}</span>
                   </div>
-                  <div className="font-mono text-slate-500 text-[10px] copy-all select-all" title={product.spu}>
-                    SPU: {product.spu}
+                  <div className="flex items-center gap-1">
+                     <span className="text-slate-400">SPU:</span>
+                     <span className="text-blue-500 hover:underline cursor-pointer">{product.spu}</span>
                   </div>
-                   <div className="font-mono text-blue-600 font-medium text-[11px] cursor-pointer hover:underline truncate max-w-[140px]" title={product.skc}>
-                    {product.skc}
+                  <div className="flex items-center gap-1">
+                     <span className="text-slate-400">SKC:</span>
+                     <span className="text-blue-500 hover:underline cursor-pointer">{product.skc}</span>
                   </div>
-                   <div className="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
-                     <Clock size={10} /> 
-                     Plan: <span className="text-slate-600">{product.planDate}</span>
-                   </div>
-                   
-                   {/* NEW: Product Line & Planner */}
-                   <div className="flex flex-wrap gap-1 mt-1">
-                      <span className="inline-flex items-center gap-1 text-[10px] text-slate-600 bg-slate-50 border border-slate-100 px-1.5 py-0.5 rounded">
-                        <Layers size={9} className="text-slate-400" /> {product.productLine}
-                      </span>
-                      <span className="inline-flex items-center gap-1 text-[10px] text-slate-600 bg-slate-50 border border-slate-100 px-1.5 py-0.5 rounded">
-                        <User size={9} className="text-slate-400" /> {product.planningDeveloper}
-                      </span>
-                   </div>
+                  <div className="flex items-center gap-1">
+                     <span className="text-slate-400">DROP:</span>
+                     <span className="text-blue-500 hover:underline cursor-pointer">{product.drop}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                     <span className="text-slate-400">计划上新日期:</span>
+                     <span>{product.planDate}</span>
+                  </div>
                 </div>
               </td>
               <td className="p-4 align-top">
-                <div className="relative w-20 h-24 rounded-lg overflow-hidden border border-slate-100 shadow-sm group-hover:shadow-md transition-all group-hover:scale-105 origin-left duration-300">
+                <div className="relative w-20 h-28 rounded overflow-hidden border border-slate-100 shadow-sm group-hover:shadow-md transition-all group-hover:scale-105 origin-left duration-300">
                     <ProductHoverPreview product={product}>
                         <img 
                             src={product.imageUrl} 
@@ -272,23 +271,29 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDecision }) => 
                 </div>
               </td>
               <td className="p-4 align-top">
-                <div className="space-y-2">
-                  <div className="text-slate-800 font-medium truncate max-w-[180px] text-[11px] px-2 py-0.5 bg-slate-50 rounded inline-block">
-                    {product.categoryPath.split('>>').pop()}
+                <div className="flex flex-col gap-1.5 text-xs text-slate-600">
+                  <div className="flex items-start gap-1">
+                     <span className="text-slate-400 whitespace-nowrap">产品分类:</span>
+                     <span className="line-clamp-2">{product.categoryPath}</span>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <div className="flex justify-between items-center w-32">
-                        <span className="text-slate-400 text-[10px]">Price</span>
-                        <span className="font-bold text-slate-900">${product.price.toFixed(1)}</span>
-                    </div>
+                  <div className="flex items-center gap-1">
+                     <span className="text-slate-400">预估估价:</span>
+                     <span>${product.price.toFixed(1)}</span>
                   </div>
-                  {/* Removed duplicates from Details column since added to Product Info */}
+                  <div className="flex items-center gap-1">
+                     <span className="text-slate-400">产品线:</span>
+                     <span>{product.productLine}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                     <span className="text-slate-400">风格线:</span>
+                     <span>{product.styleLine || product.tags[0] || 'Cute'}</span>
+                  </div>
                 </div>
               </td>
               <td className="p-4 align-top">
                 {product.selectionStatus === 'Pending' ? (
-                  <span className="text-slate-400 text-[11px] italic flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span> 待评级
+                  <span className="text-slate-400 text-xs italic">
+                    --
                   </span>
                 ) : (
                   <div className="space-y-2">
@@ -307,47 +312,55 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDecision }) => 
                 )}
               </td>
               <td className="p-4 align-top">
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full ${
-                        product.devStatus === '已完成' ? 'bg-green-400' : 
-                        product.devStatus === '已过款' ? 'bg-blue-400' : 'bg-slate-300'
-                    }`}></span>
-                    <span className="text-slate-700 font-medium">{product.devStatus}</span>
+                <div className="flex flex-col gap-1.5 text-xs text-slate-600">
+                  <div className="flex items-center gap-1">
+                     <span className="text-slate-400">开发单号:</span>
+                     <span className="text-blue-500 hover:underline cursor-pointer">{product.devUnitId}</span>
                   </div>
-                  <div className="text-[10px] text-slate-400 pl-4">
-                     ID: {product.devUnitId}
+                  <div className="flex items-center gap-1">
+                     <span className="text-slate-400">开发单状态:</span>
+                     <span>{product.devStatus}</span>
                   </div>
-                  <div className="pl-4">
-                    <span className="inline-block px-1.5 py-0.5 rounded border border-slate-200 text-slate-500 text-[10px]">
-                        {product.channel}
-                    </span>
+                  <div className="flex items-center gap-1">
+                     <span className="text-slate-400">开款渠道:</span>
+                     <span>{product.channel}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                     <span className="text-slate-400">设计师:</span>
+                     <span>{product.planningDeveloper}</span>
                   </div>
                 </div>
               </td>
               <td className="p-4 align-top">
-                 <div className="flex flex-col items-start gap-2">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border shadow-sm
-                        ${product.selectionStatus === 'Selected' ? 'bg-green-50 text-green-700 border-green-200' : 
-                        product.selectionStatus === 'Rejected' ? 'bg-red-50 text-red-700 border-red-200' :
-                        'bg-yellow-50 text-yellow-700 border-yellow-200'
-                        }
-                    `}>
-                        {product.selectionStatus === 'Selected' ? 'SELECTED' : 
-                        product.selectionStatus === 'Rejected' ? 'CANCELLED' : 'PENDING'}
+                <div className="flex flex-wrap gap-1">
+                  {product.tags.length > 0 ? product.tags.map((tag, i) => (
+                    <span key={i} className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-500 text-[10px] border border-blue-100">
+                      {tag}
                     </span>
-                    
-                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
-                        <User size={10} className="text-slate-400" />
-                        {product.operator}
-                    </div>
-                    <div className="flex flex-col text-[10px] text-slate-400 gap-0.5">
-                         <span>C: {product.createdTime.split(' ')[0]}</span>
-                         {product.selectionTime && product.selectionTime !== '-' && (
-                            <span className="text-slate-500">S: {product.selectionTime.split(' ')[0]}</span>
-                         )}
-                    </div>
-                 </div>
+                  )) : (
+                    <span className="text-slate-400">--</span>
+                  )}
+                </div>
+              </td>
+              <td className="p-4 align-top">
+                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs border
+                    ${product.selectionStatus === 'Selected' ? 'bg-green-50 text-green-600 border-green-200' : 
+                    product.selectionStatus === 'Rejected' ? 'bg-red-50 text-red-600 border-red-200' :
+                    'bg-orange-50 text-orange-500 border-orange-200'
+                    }
+                `}>
+                    {product.selectionStatus === 'Selected' ? '已选品' : 
+                    product.selectionStatus === 'Rejected' ? '已取消' : '待选品'}
+                </span>
+              </td>
+              <td className="p-4 align-top text-xs text-slate-600">
+                {product.operator || '--'}
+              </td>
+              <td className="p-4 align-top text-xs text-slate-600">
+                <div className="flex items-center gap-1">
+                    <span className="text-slate-400">创建时间:</span>
+                    <span>{product.createdTime}</span>
+                </div>
               </td>
             </tr>
           ))}

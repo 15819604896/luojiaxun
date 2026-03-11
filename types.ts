@@ -8,6 +8,7 @@ export interface Product {
   categoryPath: string;
   price: number;
   productLine: string; // New Field
+  styleLine?: string; // New Field
   stores: StoreGrade[];
   devUnitId: string;
   devStatus: string;
